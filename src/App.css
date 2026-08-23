@@ -24,7 +24,7 @@
 .hamburger{display:none;background:none;border:none;font-size:20px;cursor:pointer}
 @media(max-width:900px){
   .nav-links.left{ display:none }
-  .hamburger{display:block;margin:0 auto}
+  .hamburger{display:block;order:-1}
   .nav-logo{position:static;transform:none;font-size:12px}
   .nav-inner{justify-content:space-between;gap:10px}
   .nav-right .label{display:none}
@@ -48,6 +48,8 @@
 .hero-img{
   width:100%;
   height:auto;
+  min-height:520px;
+  object-fit:cover;
   display:block;
 }
 .hero-title{
@@ -234,7 +236,6 @@
 .crafted-desc{font-size:11px;line-height:1.65;color:var(--shadow)}
 @media(max-width:900px){
   .crafted-track{grid-template-columns:repeat(3,1fr)}
-  .crafted-person:nth-child(n+4){display:none}
   .crafted-person.featured{grid-column:span 3}
   .crafted-foot{margin:14px 0 0}
 }

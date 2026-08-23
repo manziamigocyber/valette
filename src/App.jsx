@@ -100,7 +100,7 @@ export default function App(){
 
   const popToast=(m)=>{ setToast(m); setTimeout(()=>setToast(''),2200) }
   const addToCart=()=>{ setCart(c=>c+1); popToast('Added to cart'); setModal(null) }
-  const goTo=(id)=>(e)=>{ e.preventDefault(); document.querySelector(id)?.scrollIntoView({behavior:'smooth'}) }
+  const goTo=(id)=>(e)=>{ e.preventDefault(); setDrawer(false); document.querySelector(id)?.scrollIntoView({behavior:'smooth'}) }
   const openModal=(p)=>{ setSwatch(0); setModal(p) }
 
   return (
@@ -124,10 +124,10 @@ export default function App(){
 
       <div className={'drawer '+(drawer?'open':'')} onClick={()=>setDrawer(false)}>
         <button style={{alignSelf:'end',background:'none',border:'none',fontSize:22}} onClick={()=>setDrawer(false)}>✕</button>
-        <a href="#collections" onClick={()=>setDrawer(false)}>Collections</a>
-        <a href="#craftsmanship" onClick={()=>setDrawer(false)}>Craftsmanship</a>
-        <a href="#atelier" onClick={()=>setDrawer(false)}>Atelier</a>
-        <a href="#contact" onClick={()=>setDrawer(false)}>Contact</a>
+        <a href="#collections" onClick={goTo('#collections')}>Collections</a>
+        <a href="#craftsmanship" onClick={goTo('#craftsmanship')}>Craftsmanship</a>
+        <a href="#atelier" onClick={goTo('#atelier')}>Atelier</a>
+        <a href="#contact" onClick={goTo('#contact')}>Contact</a>
       </div>
 
       {/* HERO */}
@@ -142,7 +142,7 @@ export default function App(){
       <section id="collections" className="section container">
         <div className="section-head">
           <h2>Explore Our<br/><em>Signature Collections</em></h2>
-          <a className="muted view-all" href="#" onClick={e=>{e.preventDefault();popToast('Full collection — coming soon')}}>VIEW ALL JEWELRY</a>
+          <a className="muted view-all" href="#" onClick={e=>{e.preventDefault();popToast('Full collection — coming soon')}}>VIEW ALL BAGS</a>
         </div>
         <div className="sig-grid">
           {signature.map(p=>(
@@ -214,7 +214,7 @@ export default function App(){
       <section className="container pop-section">
         <div className="pop-head">
           <h2>Popular Models</h2>
-          <a className="muted view-all" href="#" onClick={e=>{e.preventDefault();popToast('All models — coming soon')}}>VIEW ALL JEWELRY</a>
+          <a className="muted view-all" href="#" onClick={e=>{e.preventDefault();popToast('All models — coming soon')}}>VIEW ALL BAGS</a>
         </div>
         <div className="pop-grid">
           {popularRow1.map(p=>(
@@ -283,7 +283,7 @@ export default function App(){
           <input className="input" placeholder="LAST NAME" value={form.last} onChange={e=>setForm({...form,last:e.target.value})} />
           <input className="input" placeholder="YOUR PHONE" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} />
           <input className="input" placeholder="YOUR EMAIL" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} />
-          <input className="input" placeholder="MESSAGE" value={form.msg} onChange={e=>setForm({...form,msg:e.target.value})} />
+          <textarea className="input" placeholder="MESSAGE" rows={3} value={form.msg} onChange={e=>setForm({...form,msg:e.target.value})} />
           <button type="submit" className="underline-link btn-underline">REQUEST CUSTOM BAG</button>
         </form>
       </section>
