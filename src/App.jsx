@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import hero from './assets/Simbi_Bag4.jpg'
+import boss from './assets/bossimage.jpeg'
 import atelier from './assets/_A9A0835_copy.jpg'
 import elegance1 from './assets/_A9A0861_copy.jpg'
 import elegance2 from './assets/_A9A0848_copy.jpg'
@@ -11,7 +12,6 @@ import realA825 from './assets/_A9A0861_copy.jpg'
 import realA828 from './assets/_A9A0828_copy.jpg'
 import realA830 from './assets/_A9A0830_copy.jpg'
 import realA833 from './assets/_A9A0833_copy.jpg'
-import realA838 from './assets/_A9A0838_copy.jpg'
 import realA851 from './assets/_A9A0851_copy.jpg'
 import realA853 from './assets/_A9A0853_copy.jpg'
 import realA855 from './assets/_A9A0855_copy.jpg'
@@ -54,6 +54,22 @@ const XIcon = () => (
   </svg>
 )
 
+// Self-typing text — types out char-by-char, then fires onDone
+function TypeText({ text, speed = 55, className, onDone }){
+  const [n,setN]=useState(0)
+  const done = n>=text.length
+  useEffect(()=>{
+    if(done){ onDone && onDone(); return }
+    const id=setTimeout(()=>setN(n+1), speed)
+    return ()=>clearTimeout(id)
+  },[n,done,speed,onDone])
+  return (
+    <span className={className} style={{whiteSpace:'pre-line'}}>
+      {text.slice(0,n)}<span className={'tw-cursor'+(done?' done':'')} aria-hidden="true">|</span>
+    </span>
+  )
+}
+
 const signature = [
   { id:'ew', name:'EAST-WEST BAG', price:'€ 1,340', img: realA856, images:[
     {color:'#D8D3CC',img:realA856},{color:'#111111',img:realA830},{color:'#8B5A2B',img:realA853} ]},
@@ -84,15 +100,6 @@ const craftRows = [
   {n:'04',t:'HANDCRAFTED',img:realA828,desc:'Cut, stitched and finished by hand in our London atelier — 14 hours per bag on average.'},
 ]
 
-const artisanImages = [atelier, realA869, realA828, realSimbi3, realA838]
-const artisans = [
-  { name:'Ethan Carter', role:'Lead Craftsman' },
-  { name:'Lucas Reed', role:'Hand Stitching Expert' },
-  { name:'Liam Bennett', role:'Leather Specialist' },
-  { name:'Noah Sullivan', role:'Senior Artisan' },
-  { name:'Oliver Hayes', role:'Pattern Maker' },
-]
-
 export default function App(){
   const [cart,setCart]=useState(0)
   const [drawer,setDrawer]=useState(false)
@@ -101,15 +108,27 @@ export default function App(){
   const [craftOpen,setCraftOpen]=useState('01')
   const [form,setForm]=useState({name:'',last:'',phone:'',email:'',msg:''})
   const [swatch,setSwatch]=useState(0)
-  const [slide,setSlide]=useState(0)
   const [authMode,setAuthMode]=useState(null)
   const [cartOpen,setCartOpen]=useState(false)
+  const [shopIn,setShopIn]=useState(false)
 
   useEffect(() => {
     if (modal || authMode) document.body.style.overflow = 'hidden'
     else document.body.style.overflow = 'auto'
     return () => { document.body.style.overflow = 'auto' }
   }, [modal, authMode])
+
+  useEffect(() => {
+    const els = document.querySelectorAll('[data-reveal]')
+    if (!('IntersectionObserver' in window)) { els.forEach(el=>el.setAttribute('data-revealed','')); return }
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(en=>{
+        if (en.isIntersecting) { en.target.setAttribute('data-revealed',''); io.unobserve(en.target) }
+      })
+    }, { threshold:.12, rootMargin:'0px 0px -40px 0px' })
+    els.forEach(el=>io.observe(el))
+    return () => io.disconnect()
+  }, [])
 
   const toastTimer=useRef(null)
   const popToast=(m)=>{ 
@@ -151,19 +170,19 @@ export default function App(){
       {/* HERO */}
       <section className="hero">
         <img className="hero-img" src={hero} alt="AUK — model surrounded by luxury bags" />
-        <p className="hero-copy">WE MAKE IT<br/>HAPPEN</p>
-        <a className="underline-link hero-shop" href="#collections" onClick={goTo('#collections')}>Shop now</a>
+        <p className="hero-copy"><TypeText text={"WE MAKE IT\nHAPPEN"} onDone={()=>setShopIn(true)} /></p>
+        <a className={'underline-link hero-shop'+(shopIn?' show':'')} href="#collections" onClick={goTo('#collections')}>Shop now</a>
       </section>
 
       {/* SIGNATURE */}
       <section id="collections" className="section container">
-        <div className="section-head">
-          <h2>Explore Our<br/><em>Signature Collections</em></h2>
+        <div className="section-head" data-reveal>
+          <h2><span className="rl">Explore Our</span><span className="rl"><em>Signature Collections</em></span></h2>
           <a className="muted view-all" href="#" onClick={e=>{e.preventDefault();popToast('Full collection — coming soon')}}>VIEW ALL BAGS</a>
         </div>
         <div className="sig-grid">
-          {signature.map(p=>(
-            <div key={p.id} className="card" onClick={()=>openModal(p)}>
+          {signature.map((p,i)=>(
+            <div key={p.id} className="card" onClick={()=>openModal(p)} data-reveal style={{transitionDelay:(i*80)+'ms'}}>
               <div className="card-img"><img src={p.img} alt={p.name} /></div>
               <div className="card-label">{p.name}</div>
               <div className="price">{p.price}</div>
@@ -173,10 +192,10 @@ export default function App(){
 
         {/* MODERN ELEGANCE */}
         <div className="elegance">
-          <div className="elegance-left">
+          <div className="elegance-left" data-reveal>
             <img src={elegance1} alt="Model holding cream tote" />
           </div>
-          <div className="elegance-right">
+          <div className="elegance-right" data-reveal style={{transitionDelay:'140ms'}}>
             <div>
               <div className="kicker">MODERN ELEGANCE IN EVERY DETAIL</div>
               <p>Our pieces are not just clothing — they are a form of self-expression. Each design is thoughtfully crafted with precision and attention to detail, using high-quality materials.</p>
@@ -190,13 +209,13 @@ export default function App(){
 
       {/* CRAFTSMANSHIP */}
       <section id="craftsmanship" className="craft container">
-        <div className="craft-head">
-          <h2>The Art of Craftsmanship</h2>
+        <div className="craft-head" data-reveal>
+          <h2><span className="rl">The Art of Craftsmanship</span></h2>
           <span className="craft-brand">AUK</span>
         </div>
         <div className="acc">
           {craftRows.map(r=>(
-            <div key={r.n} className={'acc-row'+(craftOpen===r.n?' active':'')} onClick={()=>setCraftOpen(craftOpen===r.n?null:r.n)}>
+            <div key={r.n} className={'acc-row'+(craftOpen===r.n?' active':'')} onClick={()=>setCraftOpen(craftOpen===r.n?null:r.n)} data-reveal>
               <div className="acc-line">
                 <span className="acc-num">{r.n}.</span>
                 <span className="acc-title">{r.t}</span>
@@ -215,10 +234,12 @@ export default function App(){
         {/* TIMELESS */}
         <div className="timeless">
           <span className="tl-cap tl-cap-1">Minimal shapes created by thoughtful design decisions.</span>
-          <span className="tl-word tl-1">Timeless</span>
+          <div className="tl-orbit">
+            <span className="tl-word tl-1" data-reveal>Timeless</span>
+            <span className="tl-word tl-2" data-reveal style={{transitionDelay:'90ms'}}>Everyday</span>
+            <span className="tl-word tl-3" data-reveal style={{transitionDelay:'180ms'}}>Elegance</span>
+          </div>
           <span className="tl-cap tl-cap-2">Crafted from a premium leather with a luxurious finish.</span>
-          <span className="tl-word tl-2">Everyday</span>
-          <span className="tl-word tl-3">Elegance</span>
           <div className="timeless-img">
             <img src={realA825} alt="AUK leather tote" />
           </div>
@@ -228,13 +249,13 @@ export default function App(){
 
       {/* POPULAR */}
       <section className="container pop-section">
-        <div className="pop-head">
-          <h2>Popular Models</h2>
+        <div className="pop-head" data-reveal>
+          <h2><span className="rl">Popular Models</span></h2>
           <a className="muted view-all" href="#" onClick={e=>{e.preventDefault();popToast('All models — coming soon')}}>VIEW ALL BAGS</a>
         </div>
         <div className="pop-grid">
-          {popularRow1.map(p=>(
-            <div key={p.id} className={'pop-card'+(p.large?' large':'')} onClick={()=>openModal(p)}>
+          {popularRow1.map((p,i)=>(
+            <div key={p.id} className={'pop-card'+(p.large?' large':'')} onClick={()=>openModal(p)} data-reveal style={{transitionDelay:(i*80)+'ms'}}>
               <div className="card-img"><img src={p.img} alt={p.name} /></div>
               <div className="card-label">{p.name}</div>
               <div className="price">{p.price}</div>
@@ -243,7 +264,7 @@ export default function App(){
         </div>
         <div className="pop-grid2">
           {popularRow2.map((p,i)=>(
-            <div key={p.id} className={'pop-card offset-'+i} onClick={()=>openModal(p)}>
+            <div key={p.id} className={'pop-card offset-'+i} onClick={()=>openModal(p)} data-reveal style={{transitionDelay:(i*80)+'ms'}}>
               <div className="card-img"><img src={p.img} alt={p.name} /></div>
               <div className="card-label">{p.name}</div>
               <div className="price">{p.price}</div>
@@ -254,41 +275,41 @@ export default function App(){
 
       {/* CRAFTED BY */}
       <section id="atelier" className="crafted container">
-        <div className="crafted-head">
-          <h2>Crafted By</h2>
-          <a className="muted view-all" href="#" onClick={e=>{e.preventDefault();popToast('Meet the atelier — coming soon')}}>LEARN MORE</a>
+        <div className="crafted-head" data-reveal>
+          <h2><span className="rl">Crafted By</span></h2>
+          <span className="muted">THE STORY</span>
         </div>
-        <div className="crafted-track">
-          {[0,1,2,3,4].map(i=>{
-            const idx=(slide+i)%artisans.length
-            const a=artisans[idx]
-            return (
-              <div key={idx} className={'crafted-person'+(i===2?' featured':'')}>
-                <img src={artisanImages[idx]} alt={a.name} style={{filter:i===2?'none':'grayscale(.4)'}} />
-                <h4>{a.name}</h4>
-                <p>{a.role}</p>
-              </div>
-            )
-          })}
-        </div>
-        <div className="crafted-foot">
-          <div className="crafted-arrows">
-            <button onClick={()=>setSlide(s=>(s+artisans.length-1)%artisans.length)} aria-label="previous">←</button>
-            <button onClick={()=>setSlide(s=>(s+1)%artisans.length)} aria-label="next">→</button>
+        <div className="founder">
+          <div className="founder-img" data-reveal>
+            <img src={boss} alt="The founder of AUK" />
           </div>
-          <p className="crafted-desc">The people behind every piece. Skilled hands, years of experience, and attention to every detail define our work. Each bag is crafted with precision and purpose.</p>
+          <div className="founder-body" data-reveal>
+            <div className="kicker">THE MAN BEHIND AUK</div>
+            <h3>Every piece starts with a vision — his.</h3>
+            <p>What began as a personal obsession with leather, hardware, and honest craft became a maison. Each AUK bag starts as a sketch and ends in your hands — cut, stitched, and finished by people who treat every piece like it's the only one that matters. No shortcuts. No compromise. Just bags built to last a lifetime.</p>
+            <span className="founder-sign">AUK — WE MAKE IT HAPPEN</span>
+          </div>
+        </div>
+        <div className="shop-slot" data-reveal>
+          <div className="shop-img">
+            <img src={atelier} alt="The AUK workshop" />
+          </div>
+          <div className="shop-cap">
+            <div className="kicker">THE WORKSHOP</div>
+            <p>Every bag you see starts here — where the leather is cut and stitched by hand. A full look inside the atelier is coming soon.</p>
+          </div>
         </div>
       </section>
 
       {/* CONTACT */}
       <section id="contact" className="contact container">
         <div className="big-v">A<br/>U<br/>K</div>
-        <div className="contact-mid">
+        <div className="contact-mid" data-reveal>
           <h3>Can&apos;t Find the<br/>Perfect Bag?</h3>
           <img src={realA833} alt="Model with bag" className="side-img" />
           <div className="side-caption">CREATE YOUR OWN CUSTOM DESIGN WITH AUK.</div>
         </div>
-        <form className="form" onSubmit={e=>{
+        <form className="form" data-reveal style={{transitionDelay:'140ms'}} onSubmit={e=>{
           e.preventDefault()
           if(!form.name || !form.email) return popToast('Please fill name and email')
           popToast('Request sent — we will contact you soon!')
