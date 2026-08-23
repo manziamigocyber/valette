@@ -7,7 +7,7 @@ import realSimbi from './assets/Simbi_Bag.jpg'
 import realSimbi1 from './assets/Simbi_Bag1.jpg'
 import realSimbi2 from './assets/Simbi_Bag2.jpg'
 import realSimbi3 from './assets/Simbi_Bag3.jpg'
-import realA825 from './assets/_A9A0825_copy.jpg'
+import realA825 from './assets/_A9A0861_copy.jpg'
 import realA828 from './assets/_A9A0828_copy.jpg'
 import realA830 from './assets/_A9A0830_copy.jpg'
 import realA833 from './assets/_A9A0833_copy.jpg'
@@ -106,10 +106,10 @@ export default function App(){
   const [cartOpen,setCartOpen]=useState(false)
 
   useEffect(() => {
-    if (modal) document.body.style.overflow = 'hidden'
+    if (modal || authMode) document.body.style.overflow = 'hidden'
     else document.body.style.overflow = 'auto'
     return () => { document.body.style.overflow = 'auto' }
-  }, [modal])
+  }, [modal, authMode])
 
   const toastTimer=useRef(null)
   const popToast=(m)=>{ 
@@ -135,7 +135,7 @@ export default function App(){
           <div className="nav-right">
             <a href="#contact" onClick={goTo('#contact')} className="label">Contact</a>
             <button className="icon-btn" aria-label="cart" onClick={()=>popToast('Cart: '+cart+' items')}><CartIcon />{cart>0 && <span className="cart-badge">{cart}</span>}</button>
-            <button className="icon-btn" aria-label="account" onClick={()=>popToast('Account — coming soon')}><UserIcon /></button>
+            <button className="icon-btn" aria-label="account" onClick={()=>setAuthMode('login')}><UserIcon /></button>
           </div>
         </div>
       </nav>
@@ -149,9 +149,10 @@ export default function App(){
       </div>
 
       {/* HERO */}
-      <section className="hero container">
+      <section className="hero">
         <img className="hero-img" src={hero} alt="AUK — model surrounded by luxury bags" />
         <p className="hero-copy">WE MAKE IT<br/>HAPPEN</p>
+        <a className="underline-link hero-shop" href="#collections" onClick={goTo('#collections')}>Shop now</a>
       </section>
 
       {/* SIGNATURE */}
@@ -233,7 +234,7 @@ export default function App(){
         </div>
         <div className="pop-grid">
           {popularRow1.map(p=>(
-            <div key={p.id} className="pop-card" onClick={()=>openModal(p)}>
+            <div key={p.id} className={'pop-card'+(p.large?' large':'')} onClick={()=>openModal(p)}>
               <div className="card-img"><img src={p.img} alt={p.name} /></div>
               <div className="card-label">{p.name}</div>
               <div className="price">{p.price}</div>
@@ -242,7 +243,7 @@ export default function App(){
         </div>
         <div className="pop-grid2">
           {popularRow2.map((p,i)=>(
-            <div key={p.id} className="pop-card" onClick={()=>openModal(p)}>
+            <div key={p.id} className={'pop-card offset-'+i} onClick={()=>openModal(p)}>
               <div className="card-img"><img src={p.img} alt={p.name} /></div>
               <div className="card-label">{p.name}</div>
               <div className="price">{p.price}</div>
@@ -262,8 +263,8 @@ export default function App(){
             const idx=(slide+i)%artisans.length
             const a=artisans[idx]
             return (
-              <div key={idx} className="crafted-person">
-                <img src={artisanImages[idx]} alt={a.name} />
+              <div key={idx} className={'crafted-person'+(i===2?' featured':'')}>
+                <img src={artisanImages[idx]} alt={a.name} style={{filter:i===2?'none':'grayscale(.4)'}} />
                 <h4>{a.name}</h4>
                 <p>{a.role}</p>
               </div>
@@ -299,7 +300,7 @@ export default function App(){
           <input className="input" placeholder="YOUR PHONE" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} />
           <input className="input" placeholder="YOUR EMAIL" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} />
           <textarea className="input" placeholder="MESSAGE" rows={3} value={form.msg} onChange={e=>setForm({...form,msg:e.target.value})} />
-          <button type="submit" className="underline-link btn-underline">REQUEST CUSTOM BAG</button>
+          <button type="submit" className="btn-request">REQUEST CUSTOM BAG →</button>
         </form>
       </section>
 
@@ -334,6 +335,7 @@ export default function App(){
             EMAIL: INFO@AUK.COM<br/>PHONE: +44 20 0000 000
           </span>
         </div>
+        <div className="foot-watermark-wrap"><div className="foot-watermark">AUK</div></div>
       </footer>
 
       {toast && <div className="toast show">{toast}</div>}
@@ -364,6 +366,48 @@ export default function App(){
                   <button className="btn outline" onClick={addToCart}>ORDER NOW</button>
                   <button className="btn ghost" onClick={()=>{setModal(null);document.querySelector('#contact')?.scrollIntoView({behavior:'smooth'})}}>ORDER CUSTOM VERSION</button>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AUTH MODAL */}
+      {authMode && (
+        <div className="modal auth-modal" onClick={()=>setAuthMode(null)}>
+          <div className="auth-container" onClick={e=>e.stopPropagation()}>
+            <button className="modal-x auth-x" onClick={()=>setAuthMode(null)}>✕</button>
+            <div className="auth-content">
+              <h2 className="auth-title">{authMode==='login'?'SIGN IN':'CREATE ACCOUNT'}</h2>
+              <p className="auth-subtitle">
+                {authMode==='login'?'Welcome back. Sign in to access your account.':'Join AUK for exclusive access to new collections and personalized services.'}
+              </p>
+              <form className="auth-form" onSubmit={e=>{e.preventDefault();popToast(authMode==='login'?'Welcome back!':'Account created!');setAuthMode(null)}}>
+                {authMode==='register'&&(
+                  <div className="auth-row">
+                    <input className="auth-input" placeholder="FIRST NAME" required />
+                    <input className="auth-input" placeholder="LAST NAME" required />
+                  </div>
+                )}
+                <input className="auth-input" type="email" placeholder="EMAIL ADDRESS" required />
+                <input className="auth-input" type="password" placeholder="PASSWORD" required />
+                {authMode==='register'&&(
+                  <input className="auth-input" type="password" placeholder="CONFIRM PASSWORD" required />
+                )}
+                {authMode==='login'&&(
+                  <a href="#" className="auth-forgot" onClick={e=>{e.preventDefault();popToast('Reset link sent')}}>Forgot password?</a>
+                )}
+                <button type="submit" className="auth-submit">
+                  {authMode==='login'?'SIGN IN →':'CREATE ACCOUNT →'}
+                </button>
+              </form>
+              <div className="auth-divider"><span>OR</span></div>
+              <div className="auth-toggle">
+                {authMode==='login'?(
+                  <p>Don't have an account? <button className="auth-link" onClick={()=>setAuthMode('register')}>Create one</button></p>
+                ):(
+                  <p>Already have an account? <button className="auth-link" onClick={()=>setAuthMode('login')}>Sign in</button></p>
+                )}
               </div>
             </div>
           </div>
