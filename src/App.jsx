@@ -54,18 +54,36 @@ const XIcon = () => (
   </svg>
 )
 
-// Self-typing text — types out char-by-char, then fires onDone
-function TypeText({ text, speed = 55, className, onDone }){
+// Self-typing text — types out char-by-char, then fires onDone.
+// When loop is true it types, pauses, deletes, and retypes forever.
+function TypeText({ text, speed = 55, deleteSpeed = 28, pause = 1600, loop = false, className, onDone }){
   const [n,setN]=useState(0)
-  const done = n>=text.length
+  const [deleting,setDeleting]=useState(false)
+  const fired=useRef(false)
+  const reduce = typeof window!=='undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  if(reduce) return <span className={className} style={{whiteSpace:'pre-line'}}>{text}</span>
+  const full=text.length
+  const done = !deleting && n>=full
   useEffect(()=>{
-    if(done){ onDone && onDone(); return }
-    const id=setTimeout(()=>setN(n+1), speed)
-    return ()=>clearTimeout(id)
-  },[n,done,speed,onDone])
+    if(done){
+      if(onDone && !fired.current){ fired.current=true; onDone() }
+      if(!loop) return
+      const t=setTimeout(()=>setDeleting(true), pause)
+      return ()=>clearTimeout(t)
+    }
+    const t=setTimeout(()=>{
+      if(deleting){
+        setN(n-1)
+        if(n-1===0) setDeleting(false)
+      } else {
+        setN(n+1)
+      }
+    }, deleting?deleteSpeed:speed)
+    return ()=>clearTimeout(t)
+  },[n,deleting,done,loop,speed,deleteSpeed,pause,onDone])
   return (
     <span className={className} style={{whiteSpace:'pre-line'}}>
-      {text.slice(0,n)}<span className={'tw-cursor'+(done?' done':'')} aria-hidden="true">|</span>
+      {text.slice(0,n)}<span className="tw-cursor" aria-hidden="true">|</span>
     </span>
   )
 }
@@ -170,7 +188,7 @@ export default function App(){
       {/* HERO */}
       <section className="hero">
         <img className="hero-img" src={hero} alt="AUK — model surrounded by luxury bags" />
-        <p className="hero-copy"><TypeText text={"WE MAKE IT\nHAPPEN"} onDone={()=>setShopIn(true)} /></p>
+        <p className="hero-copy"><TypeText text={"WE MAKE IT\nHAPPEN"} loop onDone={()=>setShopIn(true)} /></p>
         <a className={'underline-link hero-shop'+(shopIn?' show':'')} href="#collections" onClick={goTo('#collections')}>Shop now</a>
       </section>
 
