@@ -1,26 +1,26 @@
-import { useState } from 'react'
-import hero from './assets/hero-new.jpg'
-import atelier from './assets/atelier.jpg'
-import elegance1 from './assets/elegance1.jpg'
-import elegance2 from './assets/elegance2.jpg'
-import realSimbi from './assets/real/Simbi_Bag.jpg'
-import realSimbi1 from './assets/real/Simbi_Bag1.jpg'
-import realSimbi2 from './assets/real/Simbi_Bag2.jpg'
-import realSimbi3 from './assets/real/Simbi_Bag3.jpg'
-import realA825 from './assets/real/_A9A0825_copy.jpg'
-import realA828 from './assets/real/_A9A0828_copy.jpg'
-import realA830 from './assets/real/_A9A0830_copy.jpg'
-import realA833 from './assets/real/_A9A0833_copy.jpg'
-import realA838 from './assets/real/_A9A0838_copy.jpg'
-import realA851 from './assets/real/_A9A0851_copy.jpg'
-import realA853 from './assets/real/_A9A0853_copy.jpg'
-import realA855 from './assets/real/_A9A0855_copy.jpg'
-import realA856 from './assets/real/_A9A0856_copy.jpg'
-import realA859 from './assets/real/_A9A0859_copy.jpg'
-import realA863 from './assets/real/_A9A0863_copy.jpg'
-import realA867 from './assets/real/_A9A0867_copy.jpg'
-import realA869 from './assets/real/_A9A0869_copy.jpg'
-import realA872 from './assets/real/_A9A0872_copy.jpg'
+import { useState, useRef, useEffect } from 'react'
+import hero from './assets/Simbi_Bag4.jpg'
+import atelier from './assets/_A9A0835_copy.jpg'
+import elegance1 from './assets/_A9A0861_copy.jpg'
+import elegance2 from './assets/_A9A0848_copy.jpg'
+import realSimbi from './assets/Simbi_Bag.jpg'
+import realSimbi1 from './assets/Simbi_Bag1.jpg'
+import realSimbi2 from './assets/Simbi_Bag2.jpg'
+import realSimbi3 from './assets/Simbi_Bag3.jpg'
+import realA825 from './assets/_A9A0825_copy.jpg'
+import realA828 from './assets/_A9A0828_copy.jpg'
+import realA830 from './assets/_A9A0830_copy.jpg'
+import realA833 from './assets/_A9A0833_copy.jpg'
+import realA838 from './assets/_A9A0838_copy.jpg'
+import realA851 from './assets/_A9A0851_copy.jpg'
+import realA853 from './assets/_A9A0853_copy.jpg'
+import realA855 from './assets/_A9A0855_copy.jpg'
+import realA856 from './assets/_A9A0856_copy.jpg'
+import realA859 from './assets/_A9A0859_copy.jpg'
+import realA863 from './assets/_A9A0863_copy.jpg'
+import realA867 from './assets/_A9A0867_copy.jpg'
+import realA869 from './assets/_A9A0869_copy.jpg'
+import realA872 from './assets/_A9A0872_copy.jpg'
 import './App.css'
 
 const CartIcon = () => (
@@ -103,7 +103,18 @@ export default function App(){
   const [swatch,setSwatch]=useState(0)
   const [slide,setSlide]=useState(0)
 
-  const popToast=(m)=>{ setToast(m); setTimeout(()=>setToast(''),2200) }
+  useEffect(() => {
+    if (modal) document.body.style.overflow = 'hidden'
+    else document.body.style.overflow = 'auto'
+    return () => { document.body.style.overflow = 'auto' }
+  }, [modal])
+
+  const toastTimer=useRef(null)
+  const popToast=(m)=>{ 
+    setToast(m); 
+    if(toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(()=>setToast(''),2200);
+  }
   const addToCart=()=>{ setCart(c=>c+1); popToast('Added to cart'); setModal(null) }
   const goTo=(id)=>(e)=>{ e.preventDefault(); setDrawer(false); document.querySelector(id)?.scrollIntoView({behavior:'smooth'}) }
   const openModal=(p)=>{ setSwatch(0); setModal(p) }
@@ -136,10 +147,9 @@ export default function App(){
       </div>
 
       {/* HERO */}
-      <section className="hero">
+      <section className="hero container">
         <img className="hero-img" src={hero} alt="AUK — model surrounded by luxury bags" />
         <p className="hero-copy">WE MAKE IT<br/>HAPPEN</p>
-        <a className="underline-link hero-shop" href="#collections" onClick={goTo('#collections')}>Shop now</a>
       </section>
 
       {/* SIGNATURE */}
@@ -166,7 +176,6 @@ export default function App(){
           <div className="elegance-right">
             <div>
               <div className="kicker">MODERN ELEGANCE IN EVERY DETAIL</div>
-              <h3>AUK</h3>
               <p>Our pieces are not just clothing — they are a form of self-expression. Each design is thoughtfully crafted with precision and attention to detail, using high-quality materials.</p>
             </div>
             <div className="elegance-bottom">
@@ -222,7 +231,7 @@ export default function App(){
         </div>
         <div className="pop-grid">
           {popularRow1.map(p=>(
-            <div key={p.id} className={'pop-card'+(p.large?' large':'')} onClick={()=>openModal(p)}>
+            <div key={p.id} className="pop-card" onClick={()=>openModal(p)}>
               <div className="card-img"><img src={p.img} alt={p.name} /></div>
               <div className="card-label">{p.name}</div>
               <div className="price">{p.price}</div>
@@ -231,7 +240,7 @@ export default function App(){
         </div>
         <div className="pop-grid2">
           {popularRow2.map((p,i)=>(
-            <div key={p.id} className={'pop-card offset-'+i} onClick={()=>openModal(p)}>
+            <div key={p.id} className="pop-card" onClick={()=>openModal(p)}>
               <div className="card-img"><img src={p.img} alt={p.name} /></div>
               <div className="card-label">{p.name}</div>
               <div className="price">{p.price}</div>
@@ -251,8 +260,8 @@ export default function App(){
             const idx=(slide+i)%artisans.length
             const a=artisans[idx]
             return (
-              <div key={idx} className={'crafted-person'+(i===2?' featured':'')}>
-                <img src={artisanImages[idx]} alt={a.name} style={{filter:i===2?'none':'grayscale(.35)'}} />
+              <div key={idx} className="crafted-person">
+                <img src={artisanImages[idx]} alt={a.name} />
                 <h4>{a.name}</h4>
                 <p>{a.role}</p>
               </div>
@@ -323,7 +332,6 @@ export default function App(){
             EMAIL: INFO@AUK.COM<br/>PHONE: +44 20 0000 000
           </span>
         </div>
-        <div className="foot-watermark-wrap"><div className="foot-watermark">AUK</div></div>
       </footer>
 
       {toast && <div className="toast show">{toast}</div>}
@@ -336,8 +344,8 @@ export default function App(){
               <img src={(modal.images||[{img:modal.img}])[swatch]?.img || modal.img} alt={modal.name} />
               <div className="modal-body">
                 <small className="crumbs">Home&ensp;/&ensp;Collection&ensp;/&ensp;{modal.name}</small>
-                <h3>AUK Élan Tote</h3>
-                <div className="modal-price">$ 1,250 <span>— {modal.price}</span></div>
+                <h3>{modal.name}</h3>
+                <div className="modal-price">{modal.price}</div>
                 <div className="swatches">
                   {(modal.images||[{color:'#D8D3CC',img:modal.img}]).map((v,i)=><button key={i} type="button" aria-label={'color '+v.color} className={'swatch '+(swatch===i?'active':'')} style={{background:v.color}} onClick={()=>setSwatch(i)} />)}
                 </div>
