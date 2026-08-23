@@ -102,6 +102,8 @@ export default function App(){
   const [form,setForm]=useState({name:'',last:'',phone:'',email:'',msg:''})
   const [swatch,setSwatch]=useState(0)
   const [slide,setSlide]=useState(0)
+  const [authMode,setAuthMode]=useState(null)
+  const [cartOpen,setCartOpen]=useState(false)
 
   useEffect(() => {
     if (modal) document.body.style.overflow = 'hidden'
