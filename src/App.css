@@ -570,3 +570,36 @@ html{scroll-behavior:smooth}
   .auth-container{padding:36px 24px;max-width:100%;margin:20px}
   .auth-row{grid-template-columns:1fr}
 }
+
+/* SCROLL CUE + BACK TO TOP */
+.scroll-cue{
+  position:fixed;
+  left:50%;transform:translateX(-50%) translateY(12px);
+  bottom:26px;z-index:30;
+  display:flex;align-items:center;gap:8px;
+  font-size:10px;letter-spacing:.2em;color:var(--noir);
+  opacity:0;pointer-events:none;
+  transition:opacity .5s ease, transform .5s ease;
+}
+.scroll-cue.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.scroll-cue.down .cue-arrow{animation:cueBob 1.6s ease-in-out infinite}
+.scroll-cue .cue-text{
+  font-family:inherit;letter-spacing:.2em;
+  padding:8px 14px;border-radius:30px;
+  background:rgba(255,255,255,.7);backdrop-filter:blur(6px);
+  border:1px solid rgba(0,0,0,.06);
+}
+.cue-arrow{font-size:15px;line-height:1;font-weight:300}
+.cue-btn{
+  display:flex;align-items:center;gap:8px;
+  font-family:inherit;font-size:10px;letter-spacing:.2em;color:var(--noir);
+  padding:8px 14px;border-radius:30px;cursor:pointer;
+  background:rgba(255,255,255,.7);backdrop-filter:blur(6px);
+  border:1px solid rgba(0,0,0,.06);
+  transition:background .25s ease, transform .25s ease;
+}
+.cue-btn:hover{background:#fff;transform:translateY(-2px)}
+@keyframes cueBob{0%,100%{transform:translateY(-3px)}50%{transform:translateY(3px)}}
+@media(prefers-reduced-motion:reduce){
+  .scroll-cue.down .cue-arrow{animation:none}
+}

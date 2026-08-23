@@ -129,6 +129,7 @@ export default function App(){
   const [authMode,setAuthMode]=useState(null)
   const [cartOpen,setCartOpen]=useState(false)
   const [shopIn,setShopIn]=useState(false)
+  const [scrollCue,setScrollCue]=useState('down') // 'down' | 'up' | 'none'
 
   useEffect(() => {
     if (modal || authMode) document.body.style.overflow = 'hidden'
@@ -146,6 +147,20 @@ export default function App(){
     }, { threshold:.12, rootMargin:'0px 0px -40px 0px' })
     els.forEach(el=>io.observe(el))
     return () => io.disconnect()
+  }, [])
+
+  // Scroll cue: 'down' near top, 'up' near bottom, hidden in the middle
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY || document.documentElement.scrollTop
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      if (y < 80) setScrollCue('down')
+      else if (max - y < 120) setScrollCue('up')
+      else setScrollCue('none')
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive:true })
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   const toastTimer=useRef(null)
@@ -452,6 +467,15 @@ export default function App(){
           </div>
         </div>
       )}
+
+      {/* SCROLL CUE + BACK TO TOP */}
+      <div className={'scroll-cue '+(scrollCue==='down'?'show down':scrollCue==='up'?'show up':'')} aria-hidden="true">
+        {scrollCue==='up'
+          ? <button className="cue-btn" onClick={()=>window.scrollTo({top:0,behavior:'smooth'})}>
+              <span className="cue-arrow">↑</span><span className="cue-text">BACK TO TOP</span>
+            </button>
+          : <><span className="cue-text">SCROLL TO EXPLORE</span><span className="cue-arrow">↓</span></>}
+      </div>
     </>
   )
 }
