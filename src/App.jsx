@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import hero from './assets/hero.png'
+import hero from './assets/hero-new.jpg'
 import atelier from './assets/atelier.jpg'
 import elegance1 from './assets/elegance1.jpg'
 import elegance2 from './assets/elegance2.jpg'
@@ -113,7 +113,7 @@ export default function App(){
             <a href="#atelier" onClick={goTo('#atelier')}>Atelier</a>
           </div>
           <button className="hamburger" onClick={()=>setDrawer(true)} aria-label="menu">☰</button>
-          <a className="nav-logo" href="#" onClick={e=>{e.preventDefault();window.scrollTo({top:0,behavior:'smooth'})}}>V A L E T T E</a>
+          <a className="nav-logo" href="#" onClick={e=>{e.preventDefault();window.scrollTo({top:0,behavior:'smooth'})}}>A U K</a>
           <div className="nav-right">
             <a href="#contact" onClick={goTo('#contact')} className="label">Contact</a>
             <button className="icon-btn" aria-label="cart" onClick={()=>popToast('Cart: '+cart+' items')}><CartIcon />{cart>0 && <span className="cart-badge">{cart}</span>}</button>
@@ -132,9 +132,9 @@ export default function App(){
 
       {/* HERO */}
       <section className="hero">
-        <img className="hero-img" src={hero} alt="Valette — model surrounded by luxury bags" />
-        <h1 className="hero-title">CUSTOM LUXURY BAGS</h1>
-        <p className="hero-copy">Crafted<br/>Exclusively<br/>For You</p>
+        <img className="hero-img" src={hero} alt="AUK — model surrounded by luxury bags" />
+        <h1 className="hero-title">AUK</h1>
+        <p className="hero-copy">WE MAKE IT<br/>HAPPEN</p>
         <a className="underline-link hero-shop" href="#collections" onClick={goTo('#collections')}>Shop now</a>
       </section>
 
@@ -162,7 +162,7 @@ export default function App(){
           <div className="elegance-right">
             <div>
               <div className="kicker">MODERN ELEGANCE IN EVERY DETAIL</div>
-              <h3>VALETTE</h3>
+              <h3>AUK</h3>
               <p>Our pieces are not just clothing — they are a form of self-expression. Each design is thoughtfully crafted with precision and attention to detail, using high-quality materials.</p>
             </div>
             <div className="elegance-bottom">
@@ -176,7 +176,7 @@ export default function App(){
       <section id="craftsmanship" className="craft container">
         <div className="craft-head">
           <h2>The Art of Craftsmanship</h2>
-          <span className="craft-brand">VALETTE</span>
+          <span className="craft-brand">AUK</span>
         </div>
         <div className="acc">
           {craftRows.map(r=>(
@@ -204,7 +204,7 @@ export default function App(){
           <span className="tl-word tl-2">Everyday</span>
           <span className="tl-word tl-3">Elegance</span>
           <div className="timeless-img">
-            <img src={realA825} alt="Valette leather tote" />
+            <img src={realA825} alt="AUK leather tote" />
           </div>
           <a className="underline-link tl-shop" href="#collections" onClick={goTo('#collections')}>Shop now</a>
         </div>
@@ -266,11 +266,11 @@ export default function App(){
 
       {/* CONTACT */}
       <section id="contact" className="contact container">
-        <div className="big-v">V<br/>A<br/>L</div>
+        <div className="big-v">A<br/>U<br/>K</div>
         <div className="contact-mid">
           <h3>Can&apos;t Find the<br/>Perfect Bag?</h3>
           <img src={realA833} alt="Model with bag" className="side-img" />
-          <div className="side-caption">CREATE YOUR OWN CUSTOM DESIGN WITH VALETTE.</div>
+          <div className="side-caption">CREATE YOUR OWN CUSTOM DESIGN WITH AUK.</div>
         </div>
         <form className="form" onSubmit={e=>{
           e.preventDefault()
@@ -292,7 +292,7 @@ export default function App(){
       <footer className="footer">
         <div className="container foot-grid">
           <div className="foot-col">
-            <h4>VALETTE</h4>
+            <h4>AUK</h4>
             <p>CUSTOM LUXURY BAGS</p>
           </div>
           <div className="foot-col">
@@ -314,12 +314,12 @@ export default function App(){
         </div>
         <div className="container foot-bottom">
           <span>45 ELM AVENUE,<br/>LONDON, UNITED KINGDOM</span>
-          <span>© 2026 VALETTE ALL RIGHTS RESERVED.</span>
+          <span>© 2026 AUK ALL RIGHTS RESERVED.</span>
           <span className="foot-contact">
-            EMAIL: VALETTE@GMAIL.COM<br/>PHONE: +38098000000
+            EMAIL: INFO@AUK.COM<br/>PHONE: +44 20 0000 000
           </span>
         </div>
-        <div className="foot-watermark-wrap"><div className="foot-watermark">VALETTE</div></div>
+        <div className="foot-watermark-wrap"><div className="foot-watermark">AUK</div></div>
       </footer>
 
       {toast && <div className="toast show">{toast}</div>}
@@ -332,7 +332,7 @@ export default function App(){
               <img src={modal.img} alt={modal.name} />
               <div className="modal-body">
                 <small className="crumbs">Home&ensp;/&ensp;Collection&ensp;/&ensp;{modal.name}</small>
-                <h3>Valette Élan Tote</h3>
+                <h3>AUK Élan Tote</h3>
                 <div className="modal-price">$ 1,250 <span>— {modal.price}</span></div>
                 <div className="swatches">
                   {['#D8D3CC','#111111','#8B5A2B'].map((c,i)=><button key={c} type="button" aria-label={'color '+c} className={'swatch '+(swatch===i?'active':'')} style={{background:c}} onClick={()=>setSwatch(i)} />)}
@@ -345,7 +345,7 @@ export default function App(){
                   <li>Handcrafted construction</li>
                   <li>Soft microfiber lining</li>
                 </ul>
-                <p className="modal-desc">The Valette Élan Tote is designed for women who appreciate minimalist design and high-quality craftsmanship. The bag offers spacious interior, durable materials, and timeless style that fits both casual and elegant outfits.</p>
+                <p className="modal-desc">The AUK Élan Tote is designed for women who appreciate minimalist design and high-quality craftsmanship. The bag offers spacious interior, durable materials, and timeless style that fits both casual and elegant outfits.</p>
                 <div className="modal-actions">
                   <button className="btn outline" onClick={addToCart}>ORDER NOW</button>
                   <button className="btn ghost" onClick={()=>{setModal(null);document.querySelector('#contact')?.scrollIntoView({behavior:'smooth'})}}>ORDER CUSTOM VERSION</button>

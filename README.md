@@ -1,6 +1,8 @@
-# VALETTE
+# AUK
 
 Custom luxury bags storefront built with React + Vite.
+
+**Brand:** AUK — *We Make It Happen*
 
 ## Features
 
