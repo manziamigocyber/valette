@@ -16,6 +16,7 @@ import realA851 from './assets/real/_A9A0851_copy.jpg'
 import realA853 from './assets/real/_A9A0853_copy.jpg'
 import realA855 from './assets/real/_A9A0855_copy.jpg'
 import realA856 from './assets/real/_A9A0856_copy.jpg'
+import realA859 from './assets/real/_A9A0859_copy.jpg'
 import realA863 from './assets/real/_A9A0863_copy.jpg'
 import realA867 from './assets/real/_A9A0867_copy.jpg'
 import realA869 from './assets/real/_A9A0869_copy.jpg'
@@ -54,10 +55,14 @@ const XIcon = () => (
 )
 
 const signature = [
-  { id:'ew', name:'EAST-WEST BAG', price:'€ 1,340', img: realA856 },
-  { id:'mb', name:'MODERN BUCKET', price:'€ 1,290', img: realA863 },
-  { id:'ns', name:'NORTH-SOUTH TOTE', price:'€ 1,420', img: realA855 },
-  { id:'st', name:'STRUCTURED TOTE', price:'€ 1,560', img: realA867 },
+  { id:'ew', name:'EAST-WEST BAG', price:'€ 1,340', img: realA856, images:[
+    {color:'#D8D3CC',img:realA856},{color:'#111111',img:realA830},{color:'#8B5A2B',img:realA853} ]},
+  { id:'mb', name:'MODERN BUCKET', price:'€ 1,290', img: realA863, images:[
+    {color:'#D8D3CC',img:realA863},{color:'#111111',img:realSimbi2},{color:'#8B5A2B',img:realA872} ]},
+  { id:'ns', name:'NORTH-SOUTH TOTE', price:'€ 1,420', img: realA855, images:[
+    {color:'#D8D3CC',img:realA855},{color:'#111111',img:realSimbi3},{color:'#8B5A2B',img:realA851} ]},
+  { id:'st', name:'STRUCTURED TOTE', price:'€ 1,560', img: realA867, images:[
+    {color:'#D8D3CC',img:realA867},{color:'#111111',img:realA859},{color:'#8B5A2B',img:realSimbi} ]},
 ]
 
 const popularRow1 = [
@@ -133,7 +138,6 @@ export default function App(){
       {/* HERO */}
       <section className="hero">
         <img className="hero-img" src={hero} alt="AUK — model surrounded by luxury bags" />
-        <h1 className="hero-title">AUK</h1>
         <p className="hero-copy">WE MAKE IT<br/>HAPPEN</p>
         <a className="underline-link hero-shop" href="#collections" onClick={goTo('#collections')}>Shop now</a>
       </section>
@@ -329,13 +333,13 @@ export default function App(){
           <div style={{position:'relative',width:'100%',maxWidth:900}} onClick={e=>e.stopPropagation()}>
             <button className="modal-x" onClick={()=>setModal(null)}>✕</button>
             <div className="modal-card">
-              <img src={modal.img} alt={modal.name} />
+              <img src={(modal.images||[{img:modal.img}])[swatch]?.img || modal.img} alt={modal.name} />
               <div className="modal-body">
                 <small className="crumbs">Home&ensp;/&ensp;Collection&ensp;/&ensp;{modal.name}</small>
                 <h3>AUK Élan Tote</h3>
                 <div className="modal-price">$ 1,250 <span>— {modal.price}</span></div>
                 <div className="swatches">
-                  {['#D8D3CC','#111111','#8B5A2B'].map((c,i)=><button key={c} type="button" aria-label={'color '+c} className={'swatch '+(swatch===i?'active':'')} style={{background:c}} onClick={()=>setSwatch(i)} />)}
+                  {(modal.images||[{color:'#D8D3CC',img:modal.img}]).map((v,i)=><button key={i} type="button" aria-label={'color '+v.color} className={'swatch '+(swatch===i?'active':'')} style={{background:v.color}} onClick={()=>setSwatch(i)} />)}
                 </div>
                 <ul className="spec-list">
                   <li><strong>Material:</strong> Full-grain leather</li>
