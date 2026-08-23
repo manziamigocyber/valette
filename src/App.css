@@ -70,7 +70,7 @@
 .hero-shop{
   position:absolute;z-index:2;
   right:max(24px,calc((100% - 1320px)/2 + 60px));
-  top:clamp(80px,12vw,140px);
+  top:clamp(150px,20vw,240px);
   font-size:11px;letter-spacing:.16em;color:var(--noir);
   opacity:0;transform:translateY(6px);
   transition:opacity .6s ease, transform .6s ease, background .25s ease, color .25s ease;
@@ -84,7 +84,7 @@
 @media(max-width:900px){
   .hero-img{height:auto;min-height:0;max-height:70vh;object-fit:cover;object-position:center 60%}
   .hero-copy{font-size:clamp(16px,5vw,28px);top:clamp(10px,3vw,30px)}
-  .hero-shop{top:clamp(55px,10vw,80px);right:20px;transform:none;bottom:auto}
+  .hero-shop{top:clamp(110px,20vw,160px);right:20px;transform:none;bottom:auto}
 }
 
 /* SIGNATURE */
