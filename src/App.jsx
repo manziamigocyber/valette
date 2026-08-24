@@ -1,26 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
 import hero from './assets/Simbi_Bag4.jpg'
-import boss from './assets/bossimage.jpeg'
+import boss from './assets/craftmakerboss.jpg'
+import team from './assets/team.jpg'
 import atelier from './assets/_A9A0835_copy.jpg'
-import elegance1 from './assets/_A9A0861_copy.jpg'
 import elegance2 from './assets/_A9A0848_copy.jpg'
-import realSimbi from './assets/Simbi_Bag.jpg'
-import realSimbi1 from './assets/Simbi_Bag1.jpg'
-import realSimbi2 from './assets/Simbi_Bag2.jpg'
-import realSimbi3 from './assets/Simbi_Bag3.jpg'
-import realA825 from './assets/_A9A0861_copy.jpg'
-import realA828 from './assets/_A9A0828_copy.jpg'
-import realA830 from './assets/_A9A0830_copy.jpg'
-import realA833 from './assets/_A9A0833_copy.jpg'
-import realA851 from './assets/_A9A0851_copy.jpg'
-import realA853 from './assets/_A9A0853_copy.jpg'
-import realA855 from './assets/_A9A0855_copy.jpg'
-import realA856 from './assets/_A9A0856_copy.jpg'
-import realA859 from './assets/_A9A0859_copy.jpg'
-import realA863 from './assets/_A9A0863_copy.jpg'
-import realA867 from './assets/_A9A0867_copy.jpg'
-import realA869 from './assets/_A9A0869_copy.jpg'
-import realA872 from './assets/_A9A0872_copy.jpg'
+import customTote from './assets/_A9A0861_copy.jpg'
+import sideModel from './assets/_A9A0833_copy.jpg'
+import { signature, popularRow1, popularRow2, craftRows, allProducts } from './data/products.js'
 import './App.css'
 
 const CartIcon = () => (
@@ -99,41 +85,24 @@ function TypeText({ text, speed = 55, deleteSpeed = 28, pause = 1600, loop = fal
   )
 }
 
-const parsePrice = (s) => Number(String(s).replace(/[^0-9.]/g,'')) || 0
 const fmtEuro = (n) => '€ ' + Math.round(n).toLocaleString('en-US')
 
-const signature = [
-  { id:'ew', name:'EAST-WEST BAG', price:'€ 1,340', img: realA856, images:[
-    {color:'#D8D3CC',img:realA856},{color:'#111111',img:realA830},{color:'#8B5A2B',img:realA853} ]},
-  { id:'mb', name:'MODERN BUCKET', price:'€ 1,290', img: realA863, images:[
-    {color:'#D8D3CC',img:realA863},{color:'#111111',img:realSimbi2},{color:'#8B5A2B',img:realA872} ]},
-  { id:'ns', name:'NORTH-SOUTH TOTE', price:'€ 1,420', img: realA855, images:[
-    {color:'#D8D3CC',img:realA855},{color:'#111111',img:realSimbi3},{color:'#8B5A2B',img:realA851} ]},
-  { id:'st', name:'STRUCTURED TOTE', price:'€ 1,560', img: realA867, images:[
-    {color:'#D8D3CC',img:realA867},{color:'#111111',img:realA859},{color:'#8B5A2B',img:realSimbi} ]},
-]
-
-const popularRow1 = [
-  { id:'aurelia', name:'AURELIA TOTE', price:'€ 1,240', img: realSimbi1, large:true },
-  { id:'aurelia2', name:'AURELIA TOTE', price:'€ 1,340', img: realA872 },
-  { id:'aurelia3', name:'AURELIA TOTE', price:'€ 1,340', img: realA853 },
-]
-
-const popularRow2 = [
-  { id:'luxe', name:'LUXEJOIE BAG', price:'€ 1,340', img: realA851 },
-  { id:'elara', name:'ELARA BAG', price:'€ 1,540', img: realSimbi2 },
-  { id:'aurelia4', name:'AURELIA TOTE', price:'€ 940', img: realA830 },
-]
-
-const craftRows = [
-  {n:'01',t:'MATERIALS',img:realA869,desc:'Full-grain leathers, solid brass hardware, and microfiber linings selected for decades of use.'},
-  {n:'02',t:'CUSTOM DESIGN',img:realA825,desc:'Every bag is made to match your personal style and preferences. You can choose the size, color, and details that suit you best.'},
-  {n:'03',t:'TIMELESS QUALITY',img:realSimbi,desc:'Reinforced stitching, hand-painted edges, and rigorous quality control ensure lasting beauty.'},
-  {n:'04',t:'HANDCRAFTED',img:realA828,desc:'Cut, stitched and finished by hand in our London atelier — 14 hours per bag on average.'},
-]
-
 export default function App(){
-  const [cart,setCart]=useState([]) // array of {key,name,price,img,qty}
+  // Cart persists in localStorage. Only {key,qty} is stored — images/prices are
+  // re-resolved from the catalogue on load (asset URLs are content-hashed per build).
+  const [cart,setCart]=useState(()=>{
+    try{
+      const raw = localStorage.getItem('auk-cart')
+      const saved = raw ? JSON.parse(raw) : []
+      if(!Array.isArray(saved)) return []
+      return saved.flatMap(s=>{
+        const p = allProducts.find(x=>x.id===s?.key)
+        const qty = Math.floor(Number(s?.qty))
+        if(!p || !(qty>0)) return []
+        return [{key:p.id, name:p.name, price:p.price, img:p.img, qty}]
+      })
+    }catch{ return [] }
+  })
   const [drawer,setDrawer]=useState(false)
   const [toast,setToast]=useState('')
   const [modal,setModal]=useState(null)
@@ -150,6 +119,16 @@ export default function App(){
     else document.body.style.overflow = 'auto'
     return () => { document.body.style.overflow = 'auto' }
   }, [modal, authMode, cartOpen])
+
+  // persist cart
+  useEffect(() => {
+    try{ localStorage.setItem('auk-cart', JSON.stringify(cart.map(x=>({key:x.key, qty:x.qty})))) }catch{ /* storage unavailable */ }
+  }, [cart])
+
+  // modal open — preload every colorway photo so swatch switching is instant
+  useEffect(() => {
+    if (modal) (modal.images||[]).forEach(v=>{ const im=new Image(); im.src=v.img })
+  }, [modal])
 
   useEffect(() => {
     const els = document.querySelectorAll('[data-reveal]')
@@ -177,6 +156,15 @@ export default function App(){
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // Escape closes any open overlay (menu drawer, product modal, cart, auth)
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') { setModal(null); setAuthMode(null); setCartOpen(false); setDrawer(false) }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
   const toastTimer=useRef(null)
   const popToast=(m)=>{ 
     setToast(m); 
@@ -201,9 +189,19 @@ export default function App(){
   }))
   const removeFromCart=(key)=>setCart(prev=>prev.filter(x=>x.key!==key))
   const cartCount = cart.reduce((s,x)=>s+x.qty,0)
-  const cartTotal = cart.reduce((s,x)=>s + parsePrice(x.price)*x.qty, 0)
+  const cartTotal = cart.reduce((s,x)=>s + x.price*x.qty, 0)
   const goTo=(id)=>(e)=>{ e.preventDefault(); setDrawer(false); document.querySelector(id)?.scrollIntoView({behavior:'smooth'}) }
   const openModal=(p)=>{ setSwatch(0); setModal(p) }
+  // fetch a product's colorway photos ahead of time so swatch switches are instant
+  const preloadProduct=(p)=>{ (p.images||[]).forEach(v=>{ const im=new Image(); im.src=v.img }) }
+  // product cards are interactive — keyboard support + a11y semantics
+  const cardProps=(p)=>({
+    role:'button', tabIndex:0, 'aria-label':`View ${p.name}`,
+    onClick:()=>openModal(p),
+    onMouseEnter:()=>preloadProduct(p),
+    onFocus:()=>preloadProduct(p),
+    onKeyDown:(e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openModal(p) } },
+  })
 
   return (
     <>
@@ -214,7 +212,7 @@ export default function App(){
             <a href="#craftsmanship" onClick={goTo('#craftsmanship')}>Craftsmanship</a>
             <a href="#atelier" onClick={goTo('#atelier')}>Atelier</a>
           </div>
-          <button className="hamburger" onClick={()=>setDrawer(true)} aria-label="menu">☰</button>
+          <button className="hamburger" onClick={()=>setDrawer(true)} aria-label="Open menu">☰</button>
           <a className="nav-logo" href="#" onClick={e=>{e.preventDefault();window.scrollTo({top:0,behavior:'smooth'})}}>A U K</a>
           <div className="nav-right">
             <a href="#contact" onClick={goTo('#contact')} className="label">Contact</a>
@@ -225,7 +223,7 @@ export default function App(){
       </nav>
 
       <div className={'drawer '+(drawer?'open':'')} onClick={()=>setDrawer(false)}>
-        <button style={{alignSelf:'end',background:'none',border:'none',fontSize:22}} onClick={()=>setDrawer(false)}>✕</button>
+        <button style={{alignSelf:'end',background:'none',border:'none',fontSize:22}} onClick={()=>setDrawer(false)} aria-label="Close menu">✕</button>
         <a href="#collections" onClick={goTo('#collections')}>Collections</a>
         <a href="#craftsmanship" onClick={goTo('#craftsmanship')}>Craftsmanship</a>
         <a href="#atelier" onClick={goTo('#atelier')}>Atelier</a>
@@ -234,9 +232,9 @@ export default function App(){
 
       {/* HERO */}
       <section className="hero">
-        <img className="hero-img" src={hero} alt="AUK — model surrounded by luxury bags" />
-        <p className="hero-copy"><TypeText text={"WE MAKE IT\nHAPPEN"} loop speed={110} deleteSpeed={55} pause={7000} startDelay={2500} onDone={()=>setShopIn(true)} /></p>
-        <a className={'underline-link hero-shop'+(shopIn?' show':'')} href="#collections" onClick={goTo('#collections')}>Shop now</a>
+        <img className="hero-img" src={hero} alt="AUK — model surrounded by luxury bags" fetchPriority="high" />
+        <p className="hero-copy"><TypeText text={"MAKE IT\nHAPPEN"} loop speed={110} deleteSpeed={55} pause={7000} startDelay={2500} onDone={()=>setShopIn(true)} /></p>
+        <a className={'underline-link hero-shop'+(shopIn?' show':'')} href="#collections" onClick={goTo('#collections')}>Make your order</a>
       </section>
 
       {/* SIGNATURE */}
@@ -247,10 +245,10 @@ export default function App(){
         </div>
         <div className="sig-grid">
           {signature.map((p,i)=>(
-            <div key={p.id} className="card" onClick={()=>openModal(p)} data-reveal style={{transitionDelay:(i*80)+'ms'}}>
-              <div className="card-img"><img src={p.img} alt={p.name} /></div>
+            <div key={p.id} className="card" {...cardProps(p)} data-reveal style={{transitionDelay:(i*80)+'ms'}}>
+              <div className="card-img"><img src={p.img} alt={p.name} loading="lazy" decoding="async" /></div>
               <div className="card-label">{p.name}</div>
-              <div className="price">{p.price}</div>
+              <div className="price">{fmtEuro(p.price)}</div>
             </div>
           ))}
         </div>
@@ -258,15 +256,16 @@ export default function App(){
         {/* MODERN ELEGANCE */}
         <div className="elegance">
           <div className="elegance-left" data-reveal>
-            <img src={elegance1} alt="Model holding cream tote" />
+                      <img src={customTote} alt="Model holding cream tote" loading="lazy" decoding="async" />
           </div>
           <div className="elegance-right" data-reveal style={{transitionDelay:'140ms'}}>
             <div>
               <div className="kicker">MODERN ELEGANCE IN EVERY DETAIL</div>
-              <p>Our pieces are not just clothing — they are a form of self-expression. Each design is thoughtfully crafted with precision and attention to detail, using high-quality materials.</p>
+              <p>AUK handbags are known for their understated elegance and functionality. Crafted from high-quality leather and durable materials, each AUK bag exudes timeless sophistication — blending classic designs with modern twists for the practical needs of today&apos;s stylish woman.</p>
+              <p>A blend of artistry and functionality that inspires women around the world to embrace their own unique journeys, one handbag at a time.</p>
             </div>
             <div className="elegance-bottom">
-              <img src={elegance2} alt="Brown leather tote detail" />
+              <img src={elegance2} alt="Brown leather tote detail" loading="lazy" decoding="async" />
             </div>
           </div>
         </div>
@@ -288,7 +287,7 @@ export default function App(){
               </div>
               {craftOpen===r.n && (
                 <div className="acc-body">
-                  <img src={r.img} alt={r.t} />
+                  <img src={r.img} alt={r.t} loading="lazy" decoding="async" />
                   <p>{r.desc}</p>
                 </div>
               )}
@@ -306,7 +305,7 @@ export default function App(){
           </div>
           <span className="tl-cap tl-cap-2">Crafted from a premium leather with a luxurious finish.</span>
           <div className="timeless-img">
-            <img src={realA825} alt="AUK leather tote" />
+            <img src={customTote} alt="AUK leather tote" loading="lazy" decoding="async" />
           </div>
           <a className="underline-link tl-shop" href="#collections" onClick={goTo('#collections')}>Shop now</a>
         </div>
@@ -320,19 +319,19 @@ export default function App(){
         </div>
         <div className="pop-grid">
           {popularRow1.map((p,i)=>(
-            <div key={p.id} className={'pop-card'+(p.large?' large':'')} onClick={()=>openModal(p)} data-reveal style={{transitionDelay:(i*80)+'ms'}}>
-              <div className="card-img"><img src={p.img} alt={p.name} /></div>
+            <div key={p.id} className={'pop-card'+(p.large?' large':'')} {...cardProps(p)} data-reveal style={{transitionDelay:(i*80)+'ms'}}>
+              <div className="card-img"><img src={p.img} alt={p.name} loading="lazy" decoding="async" /></div>
               <div className="card-label">{p.name}</div>
-              <div className="price">{p.price}</div>
+              <div className="price">{fmtEuro(p.price)}</div>
             </div>
           ))}
         </div>
         <div className="pop-grid2">
           {popularRow2.map((p,i)=>(
-            <div key={p.id} className={'pop-card offset-'+i} onClick={()=>openModal(p)} data-reveal style={{transitionDelay:(i*80)+'ms'}}>
-              <div className="card-img"><img src={p.img} alt={p.name} /></div>
+            <div key={p.id} className={'pop-card offset-'+i} {...cardProps(p)} data-reveal style={{transitionDelay:(i*80)+'ms'}}>
+              <div className="card-img"><img src={p.img} alt={p.name} loading="lazy" decoding="async" /></div>
               <div className="card-label">{p.name}</div>
-              <div className="price">{p.price}</div>
+              <div className="price">{fmtEuro(p.price)}</div>
             </div>
           ))}
         </div>
@@ -346,22 +345,32 @@ export default function App(){
         </div>
         <div className="founder">
           <div className="founder-img" data-reveal>
-            <img src={boss} alt="The founder of AUK" />
+            <img src={boss} alt="The founder of AUK" loading="lazy" decoding="async" />
           </div>
           <div className="founder-body" data-reveal>
-            <div className="kicker">THE MAN BEHIND AUK</div>
-            <h3>Every piece starts with a vision — his.</h3>
-            <p>What began as a personal obsession with leather, hardware, and honest craft became a maison. Each AUK bag starts as a sketch and ends in your hands — cut, stitched, and finished by people who treat every piece like it's the only one that matters. No shortcuts. No compromise. Just bags built to last a lifetime.</p>
-            <span className="founder-sign">AUK — WE MAKE IT HAPPEN</span>
+            <div className="kicker">AUK BRAND FOUNDER — C.E.O</div>
+            <h3>SHYAKA sam_Art</h3>
+            <p>His designs not only captivate the fashion world but also embody AUK&apos;s commitment to luxury and individuality, making him a driving force behind the brand&apos;s continued success and global recognition.</p>
+            <p>The name &ldquo;AUK&rdquo; was born in a high-school classroom — he used to repeat &ldquo;as you know&rdquo; during his class representations, until the students started calling him exactly that. The nickname stuck. The brand carries it.</p>
+            <span className="founder-sign">AUK — MAKE IT HAPPEN · AS U KNOW!</span>
           </div>
         </div>
         <div className="shop-slot" data-reveal>
           <div className="shop-img">
-            <img src={atelier} alt="The AUK workshop" />
+            <img src={team} alt="The AUK summer internship team" loading="lazy" decoding="async" />
+          </div>
+          <div className="shop-cap">
+            <div className="kicker">ABOUT OUR TEAM</div>
+            <p>In the land of a thousand hills — Kigali, Rwanda — three individuals embarked on an unexpected journey when they joined the AUK handbag brand for a summer internship. Each brought a unique set of skills and dreams to the table, unaware of the transformative experience that awaited them.</p>
+          </div>
+        </div>
+        <div className="shop-slot" data-reveal>
+          <div className="shop-img">
+            <img src={atelier} alt="The AUK workshop" loading="lazy" decoding="async" />
           </div>
           <div className="shop-cap">
             <div className="kicker">THE WORKSHOP</div>
-            <p>Every bag you see starts here — where the leather is cut and stitched by hand. A full look inside the atelier is coming soon.</p>
+            <p>Every bag you see starts here in our Kigali atelier — where the leather is cut and stitched by hand. A full look inside is coming soon.</p>
           </div>
         </div>
       </section>
@@ -371,7 +380,7 @@ export default function App(){
         <div className="big-v">A<br/>U<br/>K</div>
         <div className="contact-mid" data-reveal>
           <h3>Can&apos;t Find the<br/>Perfect Bag?</h3>
-          <img src={realA833} alt="Model with bag" className="side-img" />
+          <img src={sideModel} alt="Model with bag" className="side-img" loading="lazy" decoding="async" />
           <div className="side-caption">CREATE YOUR OWN CUSTOM DESIGN WITH AUK.</div>
         </div>
         <form className="form" data-reveal style={{transitionDelay:'140ms'}} onSubmit={e=>{
@@ -384,7 +393,7 @@ export default function App(){
           <input className="input" placeholder="NAME" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} />
           <input className="input" placeholder="LAST NAME" value={form.last} onChange={e=>setForm({...form,last:e.target.value})} />
           <input className="input" placeholder="YOUR PHONE" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} />
-          <input className="input" placeholder="YOUR EMAIL" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} />
+          <input className="input" type="email" placeholder="YOUR EMAIL" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} />
           <textarea className="input" placeholder="MESSAGE" rows={3} value={form.msg} onChange={e=>setForm({...form,msg:e.target.value})} />
           <button type="submit" className="btn-request">REQUEST CUSTOM BAG →</button>
         </form>
@@ -395,7 +404,7 @@ export default function App(){
         <div className="container foot-grid">
           <div className="foot-col">
             <h4>AUK</h4>
-            <p>CUSTOM LUXURY BAGS</p>
+            <p>WHERE ELEGANCE MEETS FUNCTIONALITY IN EVERY STITCH.</p>
           </div>
           <div className="foot-col">
             <h4>NAVIGATION</h4>
@@ -415,10 +424,10 @@ export default function App(){
           </div>
         </div>
         <div className="container foot-bottom">
-          <span>45 ELM AVENUE,<br/>LONDON, UNITED KINGDOM</span>
-          <span>© 2026 AUK ALL RIGHTS RESERVED.</span>
+          <span>KG 601 ST 41,<br/>KIGALI, RWANDA</span>
+          <span>© {new Date().getFullYear()} AUK ALL RIGHTS RESERVED.</span>
           <span className="foot-contact">
-            EMAIL: INFO@AUK.COM<br/>PHONE: +44 20 0000 000
+            EMAIL: SAMSHYAKA12@GMAIL.COM<br/>TEL: +250 782 551 960
           </span>
         </div>
         <div className="foot-watermark-wrap"><div className="foot-watermark">AUK</div></div>
@@ -428,28 +437,25 @@ export default function App(){
 
       {modal && (
         <div className="modal" onClick={()=>setModal(null)}>
-          <div style={{position:'relative',width:'100%',maxWidth:900}} onClick={e=>e.stopPropagation()}>
+          <div style={{position:'relative',width:'100%',maxWidth:900}} role="dialog" aria-modal="true" aria-label={modal.name} onClick={e=>e.stopPropagation()}>
             <button className="modal-x" onClick={()=>setModal(null)}>✕</button>
             <div className="modal-card">
-              <img src={(modal.images||[{img:modal.img}])[swatch]?.img || modal.img} alt={modal.name} />
+              <img src={(modal.images||[{img:modal.img}])[swatch]?.img || modal.img} alt={modal.name} decoding="async" />
               <div className="modal-body">
                 <small className="crumbs">Home&ensp;/&ensp;Collection&ensp;/&ensp;{modal.name}</small>
                 <h3>{modal.name}</h3>
-                <div className="modal-price">{modal.price}</div>
+                <div className="modal-price">{fmtEuro(modal.price)}</div>
                 <div className="swatches">
                   {(modal.images||[{color:'#D8D3CC',img:modal.img}]).map((v,i)=><button key={i} type="button" aria-label={'color '+v.color} className={'swatch '+(swatch===i?'active':'')} style={{background:v.color}} onClick={()=>setSwatch(i)} />)}
                 </div>
                 <ul className="spec-list">
-                  <li><strong>Material:</strong> Full-grain leather</li>
-                  <li><strong>Dimensions:</strong> 38 × 28 × 14 cm</li>
-                  <li>Premium full-grain leather</li>
-                  <li>Spacious interior compartment</li>
-                  <li>Handcrafted construction</li>
-                  <li>Soft microfiber lining</li>
+                  <li><strong>Material:</strong> {modal.material}</li>
+                  <li><strong>Dimensions:</strong> {modal.dimensions}</li>
+                  {(modal.features||[]).map(f=><li key={f}>{f}</li>)}
                 </ul>
-                <p className="modal-desc">The AUK Élan Tote is designed for women who appreciate minimalist design and high-quality craftsmanship. The bag offers spacious interior, durable materials, and timeless style that fits both casual and elegant outfits.</p>
+                <p className="modal-desc">{modal.desc}</p>
                 <div className="modal-actions">
-                  <button className="btn outline" onClick={addToCart}>ORDER NOW</button>
+                  <button className="btn outline" onClick={() => addToCart(modal)}>ORDER NOW</button>
                   <button className="btn ghost" onClick={()=>{setModal(null);document.querySelector('#contact')?.scrollIntoView({behavior:'smooth'})}}>ORDER CUSTOM VERSION</button>
                 </div>
               </div>
@@ -461,7 +467,7 @@ export default function App(){
       {/* CART PANEL */}
       {cartOpen && (
         <div className="modal cart-modal" onClick={()=>setCartOpen(false)}>
-          <div className="cart-panel" onClick={e=>e.stopPropagation()}>
+          <div className="cart-panel" role="dialog" aria-modal="true" aria-label="Shopping cart" onClick={e=>e.stopPropagation()}>
             <div className="cart-head">
               <h3>YOUR CART{ ' ' }<span className="cart-count">({cartCount})</span></h3>
               <button className="cart-x" onClick={()=>setCartOpen(false)} aria-label="close">✕</button>
@@ -477,7 +483,7 @@ export default function App(){
                   <img className="cart-thumb" src={item.img} alt={item.name} />
                   <div className="cart-item-body">
                     <div className="cart-item-name">{item.name}</div>
-                    <div className="cart-item-price">{item.price}</div>
+                    <div className="cart-item-price">{fmtEuro(item.price)}</div>
                     <div className="cart-qty">
                       <button className="qty-btn" onClick={()=>changeQty(item.key,-1)} aria-label="decrease">−</button>
                       <span className="qty-num">{item.qty}</span>
@@ -504,7 +510,7 @@ export default function App(){
       {/* AUTH MODAL */}
       {authMode && (
         <div className="modal auth-modal" onClick={()=>setAuthMode(null)}>
-          <div className="auth-container" onClick={e=>e.stopPropagation()}>
+          <div className="auth-container" role="dialog" aria-modal="true" aria-label={authMode==='login'?'Sign in':'Create account'} onClick={e=>e.stopPropagation()}>
             <button className="modal-x auth-x" onClick={()=>setAuthMode(null)}>✕</button>
             <div className="auth-content">
               <h2 className="auth-title">{authMode==='login'?'SIGN IN':'CREATE ACCOUNT'}</h2>
