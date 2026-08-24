@@ -233,7 +233,7 @@ export default function App(){
       {/* HERO */}
       <section className="hero">
         <img className="hero-img" src={hero} alt="AUK — model surrounded by luxury bags" fetchPriority="high" />
-        <p className="hero-copy"><TypeText text={"MAKE IT\nHAPPEN"} loop speed={110} deleteSpeed={55} pause={7000} startDelay={2500} onDone={()=>setShopIn(true)} /></p>
+        <p className="hero-copy"><TypeText text={"WE MAKE IT\nHAPPEN"} loop speed={110} deleteSpeed={55} pause={7000} startDelay={2500} onDone={()=>setShopIn(true)} /></p>
         <a className={'underline-link hero-shop'+(shopIn?' show':'')} href="#collections" onClick={goTo('#collections')}>Make your order</a>
       </section>
 

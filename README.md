@@ -2,7 +2,7 @@
 
 Custom luxury bags storefront built with React + Vite.
 
-**Brand:** AUK — *Make It Happen* · *As u know!*
+**Brand:** AUK — *We Make It Happen* · *As u know!*
 
 Handcrafted luxury bags from Kigali, Rwanda.
 
