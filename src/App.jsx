@@ -234,7 +234,10 @@ export default function App(){
       <section className="hero">
         <img className="hero-img" src={hero} alt="AUK — model surrounded by luxury bags" fetchPriority="high" />
         <p className="hero-copy"><TypeText text={"WE MAKE IT\nHAPPEN"} loop speed={110} deleteSpeed={55} pause={7000} startDelay={2500} onDone={()=>setShopIn(true)} /></p>
-        <a className={'underline-link hero-shop'+(shopIn?' show':'')} href="#collections" onClick={goTo('#collections')}>Make your order</a>
+        <a className={'hero-shop'+(shopIn?' show':'')} href="#collections" onClick={goTo('#collections')}>
+          <span>Shop now</span>
+          <span className="hero-shop-arrow" aria-hidden="true" />
+        </a>
       </section>
 
       {/* SIGNATURE */}
@@ -570,23 +573,6 @@ export default function App(){
           </div>
         </div>
       )}
-
-      {/* MAKER'S STAMP — fixed, follows the user while scrolling */}
-      <div className="stamp" aria-hidden="true">
-        <svg viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r="58" fill="rgba(255,255,255,.85)" />
-          <g className="stamp-ring">
-            <defs>
-              <path id="stamp-orbit" d="M60,60 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0" />
-            </defs>
-            <circle cx="60" cy="60" r="57.5" fill="none" stroke="#3d3833" strokeOpacity=".55" strokeWidth="1" strokeDasharray="2.5 3.5" />
-            <text className="stamp-text"><textPath href="#stamp-orbit">HANDCRAFTED · KIGALI · RWANDA · AUK ·</textPath></text>
-          </g>
-          <circle cx="60" cy="60" r="33" fill="none" stroke="#3d3833" strokeOpacity=".55" strokeWidth="1" />
-          <text x="60" y="59" textAnchor="middle" className="stamp-auk">AUK</text>
-          <text x="60" y="73" textAnchor="middle" className="stamp-sub">MAKE IT HAPPEN</text>
-        </svg>
-      </div>
 
       {/* SCROLL CUE + BACK TO TOP */}
       <div className={'scroll-cue '+(scrollCue==='down'?'show down':scrollCue==='up'?'show up':'')} aria-hidden="true">
