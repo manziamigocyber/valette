@@ -6,7 +6,7 @@ import atelier from './assets/_A9A0835_copy.jpg'
 import elegance2 from './assets/_A9A0848_copy.jpg'
 import customTote from './assets/_A9A0861_copy.jpg'
 import sideModel from './assets/_A9A0833_copy.jpg'
-import { signature, popularRow1, popularRow2, craftRows, allProducts } from './data/products.js'
+import { signature, popularRow1, popularRow2, craftRows, makingSteps, allProducts } from './data/products.js'
 import './App.css'
 
 const CartIcon = () => (
@@ -238,6 +238,7 @@ export default function App(){
       </section>
 
       {/* SIGNATURE */}
+      <div className="stitch-line" role="presentation" />
       <section id="collections" className="section container">
         <div className="section-head" data-reveal>
           <h2><span className="rl">Explore Our</span><span className="rl"><em>Signature Collections</em></span></h2>
@@ -295,6 +296,26 @@ export default function App(){
           ))}
         </div>
 
+        {/* THE MAKING — process strip */}
+        <div className="making" data-reveal>
+          <div className="making-head">
+            <span className="kicker">THE MAKING</span>
+            <span className="muted">FROM LEATHER TO LIFETIME</span>
+          </div>
+          <div className="making-grid">
+            {makingSteps.map((s,i)=>(
+              <div className="making-step" key={s.n} data-reveal style={{transitionDelay:(i*90)+'ms'}}>
+                <div className="making-img"><img src={s.img} alt={s.alt} loading="lazy" decoding="async" /></div>
+                <div className="making-meta">
+                  <span className="making-num">{s.n}</span>
+                  <span className="making-label">{s.t}</span>
+                </div>
+                <p>{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* TIMELESS */}
         <div className="timeless">
           <span className="tl-cap tl-cap-1">Minimal shapes created by thoughtful design decisions.</span>
@@ -338,6 +359,7 @@ export default function App(){
       </section>
 
       {/* CRAFTED BY */}
+      <div className="stitch-line" role="presentation" />
       <section id="atelier" className="crafted container">
         <div className="crafted-head" data-reveal>
           <h2><span className="rl">Crafted By</span></h2>
@@ -548,6 +570,23 @@ export default function App(){
           </div>
         </div>
       )}
+
+      {/* MAKER'S STAMP — fixed, follows the user while scrolling */}
+      <div className="stamp" aria-hidden="true">
+        <svg viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="58" fill="rgba(255,255,255,.85)" />
+          <g className="stamp-ring">
+            <defs>
+              <path id="stamp-orbit" d="M60,60 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0" />
+            </defs>
+            <circle cx="60" cy="60" r="57.5" fill="none" stroke="#3d3833" strokeOpacity=".55" strokeWidth="1" strokeDasharray="2.5 3.5" />
+            <text className="stamp-text"><textPath href="#stamp-orbit">HANDCRAFTED · KIGALI · RWANDA · AUK ·</textPath></text>
+          </g>
+          <circle cx="60" cy="60" r="33" fill="none" stroke="#3d3833" strokeOpacity=".55" strokeWidth="1" />
+          <text x="60" y="59" textAnchor="middle" className="stamp-auk">AUK</text>
+          <text x="60" y="73" textAnchor="middle" className="stamp-sub">MAKE IT HAPPEN</text>
+        </svg>
+      </div>
 
       {/* SCROLL CUE + BACK TO TOP */}
       <div className={'scroll-cue '+(scrollCue==='down'?'show down':scrollCue==='up'?'show up':'')} aria-hidden="true">

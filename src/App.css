@@ -66,6 +66,30 @@
   .hero-img{opacity:1;transform:none;animation:none}
 }
 
+/* MAKER'S STAMP — slowly rotating seal, fixed to the screen while scrolling */
+.stamp{
+  position:fixed;z-index:30;
+  right:clamp(20px,4vw,56px);bottom:clamp(20px,4vw,44px);
+  width:clamp(96px,11vw,138px);
+  filter:drop-shadow(0 6px 18px rgba(0,0,0,.14));
+  pointer-events:none;
+}
+.stamp svg{width:100%;height:auto;display:block}
+.stamp-ring{transform-origin:60px 60px;animation:stampSpin 26s linear infinite}
+@keyframes stampSpin{to{transform:rotate(360deg)}}
+.stamp-text{font-size:9.6px;letter-spacing:.2em;fill:#3d3833;font-weight:500}
+.stamp-auk{font-size:17px;letter-spacing:.28em;fill:#3d3833;font-weight:400}
+.stamp-sub{font-size:6px;letter-spacing:.24em;fill:#6b6259}
+@media(prefers-reduced-motion:reduce){.stamp-ring{animation:none}}
+@media(max-width:600px){.stamp{right:14px;bottom:14px;width:84px}}
+
+/* STITCH DIVIDER — dashed thread line between sections */
+.stitch-line{
+  max-width:1320px;margin:0 auto;height:0;
+  border-top:2px dashed rgba(61,56,51,.25);
+}
+@media(max-width:900px){.stitch-line{margin:0 20px}}
+
 .hero-copy{
   position:absolute;z-index:2;
   left:0;width:100%;
@@ -165,6 +189,25 @@
 @media(max-width:700px){
   .acc-body{grid-template-columns:1fr}
   .acc-cta{display:none}
+}
+
+/* THE MAKING — process strip */
+.making{margin-top:60px}
+.making-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px}
+.making-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.making-img{aspect-ratio:4/3;background:#f2f0ec;overflow:hidden}
+.making-img img{width:100%;height:100%;object-fit:cover;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.making-step:hover .making-img img{transform:scale(1.05)}
+.making-meta{
+  display:flex;align-items:baseline;gap:10px;margin-top:14px;
+  border-top:2px dashed rgba(61,56,51,.22);padding-top:12px;
+}
+.making-num{font-size:10px;color:var(--shadow)}
+.making-label{font-size:11px;letter-spacing:.16em}
+.making-step p{font-size:11px;line-height:1.7;color:var(--shadow);margin-top:8px;max-width:320px}
+@media(max-width:900px){
+  .making{margin-top:44px}
+  .making-grid{grid-template-columns:1fr;gap:30px}
 }
 
 /* TIMELESS */
@@ -419,6 +462,16 @@ h2 .rl,h3 .rl{
 .card .card-img img, .pop-card .card-img img{transition:transform .7s cubic-bezier(.2,.8,.2,1)}
 .card:hover .card-img img, .pop-card:hover .card-img img{transform:scale(1.12)}
 
+/* SADDLE-STITCH FRAME — dashed thread appears around product photos on hover */
+.card-img{position:relative}
+.card-img::after{
+  content:'';position:absolute;inset:10px;
+  border:1px dashed rgba(255,255,255,.55);
+  opacity:0;transition:opacity .35s ease;
+  pointer-events:none;z-index:1;
+}
+.card:hover .card-img::after,.pop-card:hover .card-img::after{opacity:1}
+
 .founder-img img, .shop-img img{transition:transform .7s cubic-bezier(.2,.8,.2,1)}
 .founder-img:hover img, .shop-img:hover img{transform:scale(1.05)}
 
@@ -505,7 +558,7 @@ h2 .rl,h3 .rl{
 .spec-list{list-style:none;font-size:11px;line-height:2;color:var(--shadow);columns:2;column-gap:18px}
 .spec-list strong{color:var(--noir);font-weight:500}
 .modal-desc{font-size:11px;line-height:1.7;color:var(--shadow);margin:14px 0 0}
-.modal-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.modal-actions{display:flex;gap:10px;margin-top:18px;padding-top:16px;border-top:2px dashed rgba(0,0,0,.14);flex-wrap:wrap}
 .btn{
   border:1px solid var(--noir);padding:11px 18px;
   font-size:10px;letter-spacing:.14em;cursor:pointer;font-family:inherit;

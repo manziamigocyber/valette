@@ -7,6 +7,8 @@ import realA828 from '../assets/_A9A0828_copy.jpg'
 import realA830 from '../assets/_A9A0830_copy.jpg'
 import realA851 from '../assets/_A9A0851_copy.jpg'
 import realA853 from '../assets/_A9A0853_copy.jpg'
+import realA835 from '../assets/_A9A0835_copy.jpg'
+import realA848 from '../assets/_A9A0848_copy.jpg'
 import realA855 from '../assets/_A9A0855_copy.jpg'
 import realA856 from '../assets/_A9A0856_copy.jpg'
 import realA859 from '../assets/_A9A0859_copy.jpg'
@@ -111,6 +113,22 @@ export const craftRows = [
   { n: '02', t: 'CUSTOM DESIGN', img: realA825, desc: 'Every bag is made to match your personal style and preferences. You can choose the size, color, and details that suit you best.' },
   { n: '03', t: 'TIMELESS QUALITY', img: realSimbi, desc: 'Reinforced stitching, hand-painted edges, and rigorous quality control ensure lasting beauty.' },
   { n: '04', t: 'HANDCRAFTED', img: realA828, desc: 'Cut, stitched and finished by hand in our Kigali atelier — one craftsman with one bag from first cut to final stitch.' },
+]
+
+// The Making — craftsmanship process strip shown in the Craftsmanship section
+export const makingSteps = [
+  {
+    n: '01', t: 'THE MATERIAL', img: realA835, alt: 'Suede leather and engraved wooden panel detail',
+    desc: 'Full-grain leather, suede and solid brass — chosen by hand, never from a catalogue.',
+  },
+  {
+    n: '02', t: 'THE STITCH', img: realA848, alt: 'Hand saddle-stitched seams on brown suede',
+    desc: 'Every seam is saddle-stitched by hand — two needles, one thread, no shortcuts.',
+  },
+  {
+    n: '03', t: 'THE FINISH', img: realA828, alt: 'Finished AUK satchel with wooden side panel',
+    desc: 'Edges painted, wood engraved, brass set — then a final check before a bag leaves the atelier.',
+  },
 ]
 
 // Every product in the catalogue — used to rehydrate saved carts after a rebuild
