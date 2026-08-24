@@ -63,16 +63,17 @@ function TypeText({ text, speed = 55, deleteSpeed = 28, pause = 1600, loop = fal
   const [started,setStarted]=useState(false)
   const fired=useRef(false)
   const reduce = typeof window!=='undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  if(reduce) return <span className={className} style={{whiteSpace:'pre-line'}}>{text}</span>
   const full=text.length
   const done = !deleting && n>=full
   // wait for startDelay before beginning
   useEffect(()=>{
+    if(reduce) return
     if(started) return
     const t=setTimeout(()=>setStarted(true), startDelay)
     return ()=>clearTimeout(t)
-  },[started,startDelay])
+  },[started,startDelay,reduce])
   useEffect(()=>{
+    if(reduce) return
     if(!started) return
     if(done){
       if(onDone && !fired.current){ fired.current=true; onDone() }
@@ -89,7 +90,8 @@ function TypeText({ text, speed = 55, deleteSpeed = 28, pause = 1600, loop = fal
       }
     }, deleting?deleteSpeed:speed)
     return ()=>clearTimeout(t)
-  },[n,deleting,done,loop,speed,deleteSpeed,pause,onDone,started])
+  },[n,deleting,done,loop,speed,deleteSpeed,pause,onDone,started,reduce])
+  if(reduce) return <span className={className} style={{whiteSpace:'pre-line'}}>{text}</span>
   return (
     <span className={className} style={{whiteSpace:'pre-line'}}>
       {text.slice(0,n)}<span className="tw-cursor" aria-hidden="true">|</span>
