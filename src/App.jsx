@@ -56,15 +56,24 @@ const XIcon = () => (
 
 // Self-typing text — types out char-by-char, then fires onDone.
 // When loop is true it types, pauses, deletes, and retypes forever.
-function TypeText({ text, speed = 55, deleteSpeed = 28, pause = 1600, loop = false, className, onDone }){
+// startDelay: ms to wait after mount before typing begins.
+function TypeText({ text, speed = 55, deleteSpeed = 28, pause = 1600, loop = false, startDelay = 900, className, onDone }){
   const [n,setN]=useState(0)
   const [deleting,setDeleting]=useState(false)
+  const [started,setStarted]=useState(false)
   const fired=useRef(false)
   const reduce = typeof window!=='undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   if(reduce) return <span className={className} style={{whiteSpace:'pre-line'}}>{text}</span>
   const full=text.length
   const done = !deleting && n>=full
+  // wait for startDelay before beginning
   useEffect(()=>{
+    if(started) return
+    const t=setTimeout(()=>setStarted(true), startDelay)
+    return ()=>clearTimeout(t)
+  },[started,startDelay])
+  useEffect(()=>{
+    if(!started) return
     if(done){
       if(onDone && !fired.current){ fired.current=true; onDone() }
       if(!loop) return
@@ -80,13 +89,16 @@ function TypeText({ text, speed = 55, deleteSpeed = 28, pause = 1600, loop = fal
       }
     }, deleting?deleteSpeed:speed)
     return ()=>clearTimeout(t)
-  },[n,deleting,done,loop,speed,deleteSpeed,pause,onDone])
+  },[n,deleting,done,loop,speed,deleteSpeed,pause,onDone,started])
   return (
     <span className={className} style={{whiteSpace:'pre-line'}}>
       {text.slice(0,n)}<span className="tw-cursor" aria-hidden="true">|</span>
     </span>
   )
 }
+
+const parsePrice = (s) => Number(String(s).replace(/[^0-9.]/g,'')) || 0
+const fmtEuro = (n) => '€ ' + Math.round(n).toLocaleString('en-US')
 
 const signature = [
   { id:'ew', name:'EAST-WEST BAG', price:'€ 1,340', img: realA856, images:[
@@ -119,7 +131,7 @@ const craftRows = [
 ]
 
 export default function App(){
-  const [cart,setCart]=useState(0)
+  const [cart,setCart]=useState([]) // array of {key,name,price,img,qty}
   const [drawer,setDrawer]=useState(false)
   const [toast,setToast]=useState('')
   const [modal,setModal]=useState(null)
@@ -132,10 +144,10 @@ export default function App(){
   const [scrollCue,setScrollCue]=useState('down') // 'down' | 'up' | 'none'
 
   useEffect(() => {
-    if (modal || authMode) document.body.style.overflow = 'hidden'
+    if (modal || authMode || cartOpen) document.body.style.overflow = 'hidden'
     else document.body.style.overflow = 'auto'
     return () => { document.body.style.overflow = 'auto' }
-  }, [modal, authMode])
+  }, [modal, authMode, cartOpen])
 
   useEffect(() => {
     const els = document.querySelectorAll('[data-reveal]')
@@ -169,7 +181,25 @@ export default function App(){
     if(toastTimer.current) clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(()=>setToast(''),2200);
   }
-  const addToCart=()=>{ setCart(c=>c+1); popToast('Added to cart'); setModal(null) }
+  const addToCart=(p)=>{
+    const item = p || modal
+    if(!item) return
+    const key = item.id
+    setCart(prev=>{
+      const found = prev.find(x=>x.key===key)
+      if(found) return prev.map(x=>x.key===key?{...x,qty:x.qty+1}:x)
+      return [...prev, {key, name:item.name, price:item.price, img:item.img || (item.images&&item.images[0]?.img), qty:1}]
+    })
+    popToast('Added to cart'); setModal(null)
+  }
+  const changeQty=(key,d)=>setCart(prev=>prev.flatMap(x=>{
+    if(x.key!==key) return [x]
+    const q = x.qty + d
+    return q<=0 ? [] : [{...x,qty:q}]
+  }))
+  const removeFromCart=(key)=>setCart(prev=>prev.filter(x=>x.key!==key))
+  const cartCount = cart.reduce((s,x)=>s+x.qty,0)
+  const cartTotal = cart.reduce((s,x)=>s + parsePrice(x.price)*x.qty, 0)
   const goTo=(id)=>(e)=>{ e.preventDefault(); setDrawer(false); document.querySelector(id)?.scrollIntoView({behavior:'smooth'}) }
   const openModal=(p)=>{ setSwatch(0); setModal(p) }
 
@@ -186,7 +216,7 @@ export default function App(){
           <a className="nav-logo" href="#" onClick={e=>{e.preventDefault();window.scrollTo({top:0,behavior:'smooth'})}}>A U K</a>
           <div className="nav-right">
             <a href="#contact" onClick={goTo('#contact')} className="label">Contact</a>
-            <button className="icon-btn" aria-label="cart" onClick={()=>popToast('Cart: '+cart+' items')}><CartIcon />{cart>0 && <span className="cart-badge">{cart}</span>}</button>
+            <button className="icon-btn" aria-label="cart" onClick={()=>setCartOpen(true)}><CartIcon />{cartCount>0 && <span className="cart-badge">{cartCount}</span>}</button>
             <button className="icon-btn" aria-label="account" onClick={()=>setAuthMode('login')}><UserIcon /></button>
           </div>
         </div>
@@ -203,7 +233,7 @@ export default function App(){
       {/* HERO */}
       <section className="hero">
         <img className="hero-img" src={hero} alt="AUK — model surrounded by luxury bags" />
-        <p className="hero-copy"><TypeText text={"WE MAKE IT\nHAPPEN"} loop onDone={()=>setShopIn(true)} /></p>
+        <p className="hero-copy"><TypeText text={"WE MAKE IT\nHAPPEN"} loop speed={110} deleteSpeed={55} pause={7000} startDelay={2500} onDone={()=>setShopIn(true)} /></p>
         <a className={'underline-link hero-shop'+(shopIn?' show':'')} href="#collections" onClick={goTo('#collections')}>Shop now</a>
       </section>
 
@@ -422,6 +452,49 @@ export default function App(){
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* CART PANEL */}
+      {cartOpen && (
+        <div className="modal cart-modal" onClick={()=>setCartOpen(false)}>
+          <div className="cart-panel" onClick={e=>e.stopPropagation()}>
+            <div className="cart-head">
+              <h3>YOUR CART{ ' ' }<span className="cart-count">({cartCount})</span></h3>
+              <button className="cart-x" onClick={()=>setCartOpen(false)} aria-label="close">✕</button>
+            </div>
+            <div className="cart-body">
+              {cart.length===0 ? (
+                <div className="cart-empty">
+                  <p>Your cart is empty.</p>
+                  <button className="btn outline" onClick={()=>{setCartOpen(false);document.querySelector('#collections')?.scrollIntoView({behavior:'smooth'})}}>BROWSE COLLECTION</button>
+                </div>
+              ) : cart.map(item=>(
+                <div className="cart-item" key={item.key}>
+                  <img className="cart-thumb" src={item.img} alt={item.name} />
+                  <div className="cart-item-body">
+                    <div className="cart-item-name">{item.name}</div>
+                    <div className="cart-item-price">{item.price}</div>
+                    <div className="cart-qty">
+                      <button className="qty-btn" onClick={()=>changeQty(item.key,-1)} aria-label="decrease">−</button>
+                      <span className="qty-num">{item.qty}</span>
+                      <button className="qty-btn" onClick={()=>changeQty(item.key,1)} aria-label="increase">+</button>
+                      <button className="cart-remove" onClick={()=>removeFromCart(item.key)}>Remove</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {cart.length>0 && (
+              <div className="cart-foot">
+                <div className="cart-total">
+                  <span>TOTAL</span>
+                  <span className="cart-total-val">{fmtEuro(cartTotal)}</span>
+                </div>
+                <button className="btn outline cart-checkout" onClick={()=>{setCartOpen(false);document.querySelector('#contact')?.scrollIntoView({behavior:'smooth'})}}>CHECKOUT</button>
+              </div>
+            )}
           </div>
         </div>
       )}
