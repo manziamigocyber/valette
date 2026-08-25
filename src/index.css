@@ -10,10 +10,10 @@
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;background:var(--white)}
 body{
   font-family:'Montserrat',sans-serif;
-  background:var(--white);
+  background:transparent;
   color:var(--noir);
   -webkit-font-smoothing:antialiased;
 }

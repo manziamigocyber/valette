@@ -40,6 +40,18 @@ const XIcon = () => (
   </svg>
 )
 
+const HeartIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+    <path d="M12 20.5C7.2 16.4 3.5 13.3 3.5 9.7 3.5 7.2 5.4 5.3 7.8 5.3c1.6 0 3.1.8 4.2 2.4 1.1-1.6 2.6-2.4 4.2-2.4 2.4 0 4.3 1.9 4.3 4.4 0 3.6-3.7 6.7-8.5 10.8z" />
+  </svg>
+)
+
+const ShareIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+    <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7" /><path d="M12 15V3M7.5 7.5 12 3l4.5 4.5" />
+  </svg>
+)
+
 // Self-typing text — types out char-by-char, then fires onDone.
 // When loop is true it types, pauses, deletes, and retypes forever.
 // startDelay: ms to wait after mount before typing begins.
@@ -109,6 +121,8 @@ export default function App(){
   const [craftOpen,setCraftOpen]=useState('01')
   const [form,setForm]=useState({name:'',last:'',phone:'',email:'',msg:''})
   const [swatch,setSwatch]=useState(0)
+  const [lightbox,setLightbox]=useState(false)
+  const [craftStrip,setCraftStrip]=useState(false)
   const [authMode,setAuthMode]=useState(null)
   const [cartOpen,setCartOpen]=useState(false)
   const [shopIn,setShopIn]=useState(false)
@@ -124,6 +138,15 @@ export default function App(){
   useEffect(() => {
     try{ localStorage.setItem('auk-cart', JSON.stringify(cart.map(x=>({key:x.key, qty:x.qty})))) }catch{ /* storage unavailable */ }
   }, [cart])
+
+  // craft strip — visible only while the Craftsmanship section is on screen
+  useEffect(() => {
+    const el = document.querySelector('#craftsmanship')
+    if (!el || !('IntersectionObserver' in window)) return
+    const io = new IntersectionObserver(([en])=>setCraftStrip(en.isIntersecting), { rootMargin:'-15% 0px -15% 0px' })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
 
   // modal open — preload every colorway photo so swatch switching is instant
   useEffect(() => {
@@ -159,7 +182,7 @@ export default function App(){
   // Escape closes any open overlay (menu drawer, product modal, cart, auth)
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === 'Escape') { setModal(null); setAuthMode(null); setCartOpen(false); setDrawer(false) }
+      if (e.key === 'Escape') { setModal(null); setAuthMode(null); setCartOpen(false); setDrawer(false); setLightbox(false) }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -191,7 +214,7 @@ export default function App(){
   const cartCount = cart.reduce((s,x)=>s+x.qty,0)
   const cartTotal = cart.reduce((s,x)=>s + x.price*x.qty, 0)
   const goTo=(id)=>(e)=>{ e.preventDefault(); setDrawer(false); document.querySelector(id)?.scrollIntoView({behavior:'smooth'}) }
-  const openModal=(p)=>{ setSwatch(0); setModal(p) }
+  const openModal=(p)=>{ setSwatch(0); setLightbox(false); setModal(p) }
   // fetch a product's colorway photos ahead of time so swatch switches are instant
   const preloadProduct=(p)=>{ (p.images||[]).forEach(v=>{ const im=new Image(); im.src=v.img }) }
   // product cards are interactive — keyboard support + a11y semantics
@@ -202,9 +225,16 @@ export default function App(){
     onFocus:()=>preloadProduct(p),
     onKeyDown:(e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openModal(p) } },
   })
+  const shareProduct=()=>{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(window.location.href).then(()=>popToast('Link copied'),()=>popToast('Sharing coming soon'))
+    }else popToast('Sharing coming soon')
+  }
+  const pdpPhotos = modal ? (modal.images || [{ color:'#D8D3CC', img: modal.img }]) : []
 
   return (
     <>
+      <div className={'craft-strip'+(craftStrip?' show':'')} aria-hidden="true" />
       <nav className="nav">
         <div className="container nav-inner">
           <div className="nav-links left">
@@ -235,8 +265,7 @@ export default function App(){
         <img className="hero-img" src={hero} alt="AUK — model surrounded by luxury bags" fetchPriority="high" />
         <p className="hero-copy"><TypeText text={"WE MAKE IT\nHAPPEN"} loop speed={110} deleteSpeed={55} pause={7000} startDelay={2500} onDone={()=>setShopIn(true)} /></p>
         <a className={'hero-shop'+(shopIn?' show':'')} href="#collections" onClick={goTo('#collections')}>
-          <span>Shop now</span>
-          <span className="hero-shop-arrow" aria-hidden="true" />
+          <span className="hero-shop-label">Shop now</span>
         </a>
       </section>
 
@@ -462,29 +491,59 @@ export default function App(){
 
       {modal && (
         <div className="modal" onClick={()=>setModal(null)}>
-          <div style={{position:'relative',width:'100%',maxWidth:900}} role="dialog" aria-modal="true" aria-label={modal.name} onClick={e=>e.stopPropagation()}>
+          <div style={{position:'relative',width:'100%',maxWidth:1060}} role="dialog" aria-modal="true" aria-label={modal.name} onClick={e=>e.stopPropagation()}>
             <button className="modal-x" onClick={()=>setModal(null)}>✕</button>
             <div className="modal-card">
-              <img src={(modal.images||[{img:modal.img}])[swatch]?.img || modal.img} alt={modal.name} decoding="async" />
-              <div className="modal-body">
+              {/* LEFT — main photo + purchase */}
+              <div className="pdp-left">
                 <small className="crumbs">Home&ensp;/&ensp;Collection&ensp;/&ensp;{modal.name}</small>
-                <h3>{modal.name}</h3>
+                <div className="pdp-main-img">
+                  <img src={pdpPhotos[swatch]?.img || modal.img} alt={modal.name} decoding="async" />
+                </div>
+                <h3 className="pdp-title">{modal.name}</h3>
                 <div className="modal-price">{fmtEuro(modal.price)}</div>
                 <div className="swatches">
-                  {(modal.images||[{color:'#D8D3CC',img:modal.img}]).map((v,i)=><button key={i} type="button" aria-label={'color '+v.color} className={'swatch '+(swatch===i?'active':'')} style={{background:v.color}} onClick={()=>setSwatch(i)} />)}
+                  {pdpPhotos.map((v,i)=><button key={i} type="button" aria-label={'color '+v.color} className={'swatch '+(swatch===i?'active':'')} style={{background:v.color}} onClick={()=>setSwatch(i)} />)}
                 </div>
-                <ul className="spec-list">
-                  <li><strong>Material:</strong> {modal.material}</li>
-                  <li><strong>Dimensions:</strong> {modal.dimensions}</li>
-                  {(modal.features||[]).map(f=><li key={f}>{f}</li>)}
-                </ul>
-                <p className="modal-desc">{modal.desc}</p>
-                <div className="modal-actions">
-                  <button className="btn outline" onClick={() => addToCart(modal)}>ORDER NOW</button>
+                <div className="pdp-actions">
+                  <button className="btn outline pdp-order" onClick={() => addToCart(modal)}>ORDER NOW</button>
                   <button className="btn ghost" onClick={()=>{setModal(null);document.querySelector('#contact')?.scrollIntoView({behavior:'smooth'})}}>ORDER CUSTOM VERSION</button>
                 </div>
               </div>
+              {/* RIGHT — gallery thumbs + details */}
+              <div className="pdp-right">
+                <div className="pdp-thumbs">
+                  {pdpPhotos.map((v,i)=>(
+                    <button key={i} type="button" className={'pdp-thumb'+(swatch===i?' active':'')} onClick={()=>setSwatch(i)} aria-label={'Show photo '+(i+1)}>
+                      <img src={v.img} alt={modal.name+' — view '+(i+1)} loading="lazy" decoding="async" />
+                    </button>
+                  ))}
+                  {pdpPhotos.length>1 && (
+                    <button type="button" className="pdp-all" onClick={()=>setLightbox(true)}>Show all photos. <b>{pdpPhotos.length}</b></button>
+                  )}
+                </div>
+                <div className="pdp-save-share">
+                  <button type="button" className="pdp-iconlink" onClick={()=>popToast('Saved to favourites')}><HeartIcon /> Save</button>
+                  <button type="button" className="pdp-iconlink" onClick={shareProduct}><ShareIcon /> Share</button>
+                </div>
+                <div className="pdp-specs">
+                  <span><strong>Material:</strong> {modal.material}</span>
+                  <span><strong>Dimensions:</strong> {modal.dimensions}</span>
+                </div>
+                <ul className="pdp-features">
+                  {(modal.features||[]).map(f=><li key={f}>{f}</li>)}
+                </ul>
+                <p className="pdp-desc">{modal.desc}</p>
+              </div>
             </div>
+            {lightbox && (
+              <div className="lightbox" onClick={()=>setLightbox(false)} role="dialog" aria-label={modal.name+' — all photos'}>
+                <div className="lightbox-grid" onClick={e=>e.stopPropagation()}>
+                  {pdpPhotos.map((v,i)=><img key={i} src={v.img} alt={modal.name+' — view '+(i+1)} />)}
+                </div>
+                <button type="button" className="lightbox-x" onClick={()=>setLightbox(false)} aria-label="close photos">✕</button>
+              </div>
+            )}
           </div>
         </div>
       )}
