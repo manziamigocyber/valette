@@ -274,7 +274,7 @@ export default function App(){
       <section id="collections" className="section container">
         <div className="section-head" data-reveal>
           <h2><span className="rl">Explore Our</span><span className="rl"><em>Signature Collections</em></span></h2>
-          <a className="muted view-all" href="#" onClick={e=>{e.preventDefault();popToast('Full collection — coming soon')}}>VIEW ALL BAGS</a>
+          <a className="muted view-all" href="#collections" onClick={goTo('#collections')}>VIEW ALL BAGS</a>
         </div>
         <div className="sig-grid">
           {signature.map((p,i)=>(
@@ -306,11 +306,13 @@ export default function App(){
 
       {/* CRAFTSMANSHIP */}
       <section id="craftsmanship" className="craft container">
-        <div className="craft-head" data-reveal>
-          <h2><span className="rl">The Art of Craftsmanship</span></h2>
-          <span className="craft-brand">AUK</span>
-        </div>
-        <div className="acc">
+        <div className="craft-stage">
+          <div className="craft-accent" aria-hidden="true" />
+          <div className="craft-head" data-reveal>
+            <h2><span className="rl">The Art of Craftsmanship</span></h2>
+            <span className="craft-brand">AUK</span>
+          </div>
+          <div className="acc">
           {craftRows.map(r=>(
             <div key={r.n} className={'acc-row'+(craftOpen===r.n?' active':'')} onClick={()=>setCraftOpen(craftOpen===r.n?null:r.n)} data-reveal>
               <div className="acc-line">
@@ -347,6 +349,7 @@ export default function App(){
             ))}
           </div>
         </div>
+      </div>
 
         {/* TIMELESS */}
         <div className="timeless">
@@ -368,7 +371,7 @@ export default function App(){
       <section className="container pop-section">
         <div className="pop-head" data-reveal>
           <h2><span className="rl">Popular Models</span></h2>
-          <a className="muted view-all" href="#" onClick={e=>{e.preventDefault();popToast('All models — coming soon')}}>VIEW ALL BAGS</a>
+          <a className="muted view-all" href="#collections" onClick={goTo('#collections')}>VIEW ALL BAGS</a>
         </div>
         <div className="pop-grid">
           {popularRow1.map((p,i)=>(
@@ -466,14 +469,14 @@ export default function App(){
           </div>
           <div className="foot-col">
             <h4>SUPPORT</h4>
-            <p><a href="#" onClick={e=>{e.preventDefault();popToast('Help Center — soon')}}>Help Center</a><br/><a href="#" onClick={e=>{e.preventDefault();popToast('FAQ — soon')}}>FAQ</a><br/><a href="#" onClick={e=>{e.preventDefault();popToast('Terms — soon')}}>Terms</a><br/><a href="#" onClick={e=>{e.preventDefault();popToast('Privacy — soon')}}>Privacy</a></p>
+            <p><a href="#contact" onClick={goTo('#contact')}>Help Center</a><br/><a href="#contact" onClick={goTo('#contact')}>FAQ</a><br/><a href="#contact" onClick={goTo('#contact')}>Terms</a><br/><a href="#contact" onClick={goTo('#contact')}>Privacy</a></p>
           </div>
           <div className="foot-col">
             <h4>STAY UP TO DATE</h4>
             <div className="socials">
-              <a href="#" onClick={e=>{e.preventDefault();popToast('Instagram')}} aria-label="Instagram"><InstaIcon /></a>
-              <a href="#" onClick={e=>{e.preventDefault();popToast('Facebook')}} aria-label="Facebook"><FbIcon /></a>
-              <a href="#" onClick={e=>{e.preventDefault();popToast('X')}} aria-label="X"><XIcon /></a>
+              <a href="mailto:samshyaka12@gmail.com" aria-label="Email AUK"><InstaIcon /></a>
+              <a href="mailto:samshyaka12@gmail.com" aria-label="Email AUK"><FbIcon /></a>
+              <a href="mailto:samshyaka12@gmail.com" aria-label="Email AUK"><XIcon /></a>
             </div>
           </div>
         </div>
@@ -614,7 +617,7 @@ export default function App(){
                   <input className="auth-input" type="password" placeholder="CONFIRM PASSWORD" required />
                 )}
                 {authMode==='login'&&(
-                  <a href="#" className="auth-forgot" onClick={e=>{e.preventDefault();popToast('Reset link sent')}}>Forgot password?</a>
+                  <a href="#contact" onClick={e=>{e.preventDefault();setAuthMode(null);document.querySelector('#contact')?.scrollIntoView({behavior:'smooth'})}}>Forgot password?</a>
                 )}
                 <button type="submit" className="auth-submit">
                   {authMode==='login'?'SIGN IN →':'CREATE ACCOUNT →'}
@@ -633,14 +636,6 @@ export default function App(){
         </div>
       )}
 
-      {/* SCROLL CUE + BACK TO TOP */}
-      <div className={'scroll-cue '+(scrollCue==='down'?'show down':scrollCue==='up'?'show up':'')} aria-hidden="true">
-        {scrollCue==='up'
-          ? <button className="cue-btn" onClick={()=>window.scrollTo({top:0,behavior:'smooth'})}>
-              <span className="cue-arrow">↑</span><span className="cue-text">BACK TO TOP</span>
-            </button>
-          : <><span className="cue-text">SCROLL TO EXPLORE</span><span className="cue-arrow">↓</span></>}
-      </div>
     </>
   )
 }
